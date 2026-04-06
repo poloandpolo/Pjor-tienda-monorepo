@@ -1,0 +1,64 @@
+.clothing-dropdown-menu {
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+  
+    &__button {
+      all: unset;
+      background: transparent;
+      margin: 10px 0 0 10px;
+      font-family: 'Permanent Marker', cursive;
+      font-size: 23px;
+      cursor: pointer;
+      letter-spacing: 0.1px;
+      display: flex;
+      align-items: center;
+      color: black;
+  
+      label {
+        transform: translateX(-35px);
+        position: absolute;
+      }
+    }
+  
+    &__content {
+      position: absolute;
+      min-width: 200px;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      margin-top: 10px;
+      transform: scaleY(0);
+      transform-origin: top;
+      opacity: 0;
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
+  
+    &__content--show {
+      transform: scaleY(1);
+      opacity: 1;
+      position: relative;
+    }
+  
+    @media (max-width: 768px) {
+      &__button {
+        margin: 5px 0 0 10px;
+        font-size: 15px;
+  
+        label {
+          transform: translateX(-20px);
+        }
+      }
+  
+      &__content {
+        min-width: 100px;
+      }
+  
+      &__content--show {
+        transform: scaleY(1);
+        opacity: 1;
+        position: relative;
+        transform: translateX(-5px);
+      }
+    }
+  }
+  

@@ -1,0 +1,37 @@
+.checkout-button__container {
+  width: 50%;
+  height: 2vw;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  margin: 10px auto;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Permanent Marker', cursive;
+  transition: color 0.5s ease;
+  cursor: pointer; 
+
+  &:hover {
+    background-color: white;
+    color: black;
+  }
+
+  label {
+    margin: 0;
+    font-size: 15px;
+    pointer-events: none; /* Evita que el hover sea afectado por el label */
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-button__container {
+    height: 6.5vw;
+    width: 55%;
+
+    label {
+      font-size: 11px;
+    }
+  }
+}

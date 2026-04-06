@@ -1,0 +1,250 @@
+.account-modal {
+    &__overlay {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    }
+
+    &__overlay.show {
+        z-index: 1000;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    &__content {
+        width: 40vw;
+        height: var(--content-height, 60vh);
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgb(255, 255, 255);
+        z-index: 1000;
+        border-radius: 15px;
+    }
+
+    &__close-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    &__close-button {
+        all: unset;
+        display: flex;
+        position: absolute;
+        font-family: 'Permanent Marker', cursive;
+        color: brown;
+        z-index: 1000;
+        font-size: 30px;
+        transform: translateX(-10px);
+    }
+
+    &__title {
+        font-family: Permanent Marker;
+        width: 100%;
+        color: black;
+        display: flex;
+        font-size: 17px;
+        transform: translateY(17px);
+
+        & h2 {
+            margin: auto;
+        }
+    }
+
+    &__menu {
+        font-family: Permanent Marker;
+        margin: auto;
+        color: black;
+        width: 100%;
+        height: 75%;
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px;
+        position: relative;
+        align-items: center;
+        justify-content: center;
+
+        & h2{
+            margin: auto;
+        }
+
+    }
+
+    &__info{
+        height: 95%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        margin-top: 12px;
+
+        .account-modal__info-back-button{
+            all: unset;
+            height: 45px;
+            background-color: black;
+            color: white;
+            font-family: Permanent Marker;
+            transition: box-shadow 0.3s ease-in-out;
+            width: 150px;
+            text-align: center;
+            border-radius: 15px;
+            transform: translateY(-20px);
+            font-size: 17.5px;
+        }
+
+        &-item{
+            width: 50%;
+            display: flex;
+            justify-content: space-around;
+
+            & button{
+                all: unset;
+                color: brown;
+                font-family: Barlow Condensed;
+                margin-left: 10px;
+                transform: translateY(-3px);
+            }
+        }
+
+        &-item-tag{
+            font-family: Permanent Marker;
+            color: black;
+            font-size: 22px;
+        }
+        &-item-info{
+            all: unset;
+            font-size: 20px;
+            font-family: Barlow Condensed;
+            color: black;
+            text-align: center;
+            border-radius: 13px;
+            width: 70%;
+            margin-left: 10px;
+            line-height: 35px;
+
+           
+        }
+        .account-modal__info-item-info::placeholder {
+            color: black;
+        }
+    }
+
+    &__log-out-button{
+        all: unset;
+        font-family: Permanent Marker;
+        font-size: 19px;
+        color: rgb(255, 255, 255);
+        background-color: black;
+        letter-spacing: 1px;
+        width: 185px;
+        height: 45px;
+        text-align: center;
+        border-radius: 15px;
+        transform: translateY(20px);
+    }
+
+    
+
+    &__input-wrapper {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        input {
+            all: unset;
+            width: calc(100% - 80px);
+            /* Ajuste por padding */
+            height: 45px;
+            margin: auto;
+            font-family: Barlow Condensed;
+            border: 2px solid black;
+            border-radius: 15px;
+            color: black;
+            padding-left: 35px;
+            padding-right: 35px;
+            font-size: 20px;
+            margin-top: 15px;
+        }
+
+        label {
+            text-align: center;
+            color: black;
+            font-family: Barlow Condensed;
+            transform: translateY(25px);
+            font-size: 20px;
+            margin-top: 10px;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        button {
+            height: 45px;
+            margin-top: 12px;
+            background-color: black;
+            color: white;
+            font-family: Permanent Marker;
+            transition: box-shadow 0.3s ease-in-out;
+
+            &:hover {
+                -webkit-box-shadow: 1px 10px 108px 43px rgba(0, 0, 0, 0.47);
+                -moz-box-shadow: 1px 10px 108px 43px rgba(0, 0, 0, 0.47);
+                box-shadow: 1px 10px 108px 43px rgba(0, 0, 0, 0.47);
+
+
+            }
+        }
+    }
+}
+
+
+
+@media (max-width: 376px) {
+    .account-modal {
+        &__content {
+            width: 85vw;
+            height: 80vh;
+        }
+
+        &__input-wrapper {
+            input {
+                width: calc(140% - 20px);
+                transform: translateX(-9vw);
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+    }
+}
+
+@media (min-width: 376px) and (max-width: 768px) {
+    .account-modal {
+        &__content {
+            width: 85vw;
+            height: 43vh;
+        }
+
+        &__input-wrapper {
+            input {
+                width: calc(140% - 20px);
+                transform: translateX(-9vw);
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+    }
+}

@@ -1,0 +1,176 @@
+/* styles/ClothingCard.scss */
+
+.clothing-card {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.6vw;
+    text-align: center;
+    width: 36vw;
+    height: 36vw;
+    align-items: center;
+    padding: 1.5vw;
+    position: relative;
+    color: black;
+    margin-bottom: 20px;
+
+    &--open {
+        /* Modificador para cuando la barra de ropa está abierta */
+        width: 36vw;
+        height: 36vw;
+        margin-bottom: 30px;
+    }
+
+    &__slider {
+        width: 100%;
+        height: 100%;
+        margin: auto;
+    }
+
+    .slick-list {
+        height: 100%;
+      }
+
+    &__slider-container {
+        width: 100%;
+        height: 100%;
+    }
+
+    &__slide {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    &__text {
+        margin-top: 10px;
+    }
+
+    &__cart-icon {
+        background-color: white;
+        width: 4.7vw;
+        height: 4.2vw;
+        border-radius: 5px;
+        position: relative;
+        padding: 1.5px;
+
+        &--open {
+            background-color: white;
+            width: 4.5vw;
+            height: 4.2vw;
+            border-radius: 5px;
+            position: relative;
+            padding: 1.5px;
+        }
+    }
+
+    &__details {
+        position: absolute;
+        z-index: 1000;
+        background-color: rgba(255, 255, 255, 0);
+        border-radius: 5px;
+        right: 2.1vw;
+        top: 23.3vw;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        justify-content: space-evenly;
+        color: black;
+        height: 11vw;
+
+
+    }
+
+    &__details-color {
+        width: 4.8vw;
+        height: 2.2vw;
+        position: relative;
+        background-color: white;
+        border-radius: 5px;
+
+        .clothing-card__color-thumbnail {
+            height: 2.2vw;
+            width: 4.8vw;
+            border-radius: 5px;
+            border: 2px solid black;
+        }
+    }
+
+    &__details-size {
+        width: 4.8vw;
+        height: 2.2vw;
+        background-color: white;
+        border-radius: 5px;
+        align-items: center;
+    }
+
+    &__modal-button {
+        all: unset;
+        position: absolute;
+        width: 92%;
+        height: 83%;
+    }
+}
+
+/* Media query para pantallas más pequeñas */
+@media (max-width: 768px) {
+    .clothing-card {
+        width: 80vw;
+        height: 80vw;
+        margin-bottom: 20px;
+
+        &--open {
+            width: 60vw;
+            height: 60vw;
+            margin-bottom: 55px;
+        }
+
+        &__modal-button {
+            display: none;
+        }
+
+        &__text {
+            margin-top: 10px;
+            font-size: 4vw;
+        }
+
+        &__details {
+            top: 50vw;
+            right: 3vw;
+            height: 28vw;
+
+            &--open{
+                top:30vw;
+            }
+        }
+
+        &__details-color {
+            width: 12vw;
+            height: 5vw;
+            font-size: 3.5vw;
+
+            .clothing-card__color-thumbnail {
+                width: 12vw;
+                height: 5vw;
+            }
+        }
+
+        &__details-size {
+            width: 12vw;
+            height: 5vw;
+            font-size: 3.5vw;
+        }
+
+        &__cart-icon {
+            width: 12vw;
+            height: 12vw;
+        }
+    }
+}

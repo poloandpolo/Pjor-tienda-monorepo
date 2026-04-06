@@ -1,0 +1,46 @@
+.navigation-bar {
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(8px);
+  
+    &__list {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      justify-content: space-around;
+    }
+  
+    &__item {
+      display: flex;
+      align-items: center;
+      :hover{
+        cursor: pointer;
+      }
+    }
+  
+    &__link {
+      font-size: 22.5px;
+      letter-spacing: 5px;
+      font-family: 'Creepster', cursive;
+      color: #000000; // Color del texto, ajustar según sea necesario
+      text-decoration: none;
+      transition: color 0.3s ease;
+  
+      &:hover {
+        color: beige; // Color del texto al pasar el cursor, ajustar según sea necesario
+      }
+    }
+  
+    @media (max-width: 768px) {
+      &__link {
+        font-size: 14.5px;
+        letter-spacing: 3px;
+      }
+    }
+  }
+  

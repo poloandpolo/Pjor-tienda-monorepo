@@ -1,0 +1,208 @@
+.vision-page {
+    width: 100vw;
+    min-height: 100vh;
+    background-size: cover;
+    background-image: url('/src/images/background-vision-page2.jpg');
+
+    &__first-section {
+        width: 100vw;
+        display: flex;
+
+        &-p-wrapper {
+            width: 70vw;
+            transform: translateY(8%) translateX(2%);
+
+            p {
+                font-size: 25px;
+                font-family: Barlow Condensed;
+                text-align: right;
+                color: black;
+                letter-spacing: 1.5px;
+                line-height: 42px;
+            }
+        }
+
+        &-logo-small-devices{
+            display: none;
+        }
+
+        &-logo-wrapper {
+            width: 30vw;
+            height: 90vh;
+            display: flex;
+            overflow: hidden;
+            
+            transform: translateX(5vw) translateY(0vw);
+            
+
+            .vision-page__first-section-logo-1,
+            .vision-page__first-section-logo-2,
+            .vision-page__first-section-logo-3,
+            .vision-page__first-section-logo-4 {
+                transform: rotate(90deg);
+                opacity: 1;
+                position: absolute;
+                animation: glitchEffect 85s infinite steps(250);
+            }
+
+            .vision-page__first-section-logo-1 {
+                width: 500px;
+                right: 10px;
+                animation-delay: 0s;
+            }
+
+            .vision-page__first-section-logo-2 {
+                width: 300px;
+                right: 10px;
+                top: 0;
+                animation-delay: 3s;
+            }
+
+            .vision-page__first-section-logo-3 {
+                width: 600px;
+                right: 50px;
+                top: 170px;
+                animation-delay: 5s;
+            }
+
+            .vision-page__first-section-logo-4 {
+                width: 300px;
+                right: 30px;
+                top: 300px;
+                animation-delay: 0.9s;
+            }
+        }
+    }
+}
+
+/* Para dispositivos menores a 768px */
+@media (max-width: 768px) {
+    .vision-page {
+        &__first-section { 
+            display: flex;
+            flex-direction: column;
+            &-p-wrapper {
+                width: 100vw;
+                transform: translateY(0) translateX(0);
+
+                p {
+                    font-size: 20px;
+                    text-align: justify;
+                    padding: 10px 30px;
+                    line-height: 35px;
+                }
+            }
+
+            &-logo-small-devices{
+                width: 100vw;
+                height: 30vh;
+                display: inline;
+                img{
+                    height: 100%;
+                    width: 100%;
+                    object-fit: cover;
+                    padding: 20px 30px;
+                }
+            }
+            &-logo-wrapper {
+                display: none;
+            }
+        }
+    }
+}
+
+/* Para iPad Pro específicamente, ajustado a un rango de ancho entre 768px y 1024px */
+@media (min-width: 769px) and (max-width: 1024px) and (max-height: 1366px) {
+    .vision-page {
+        &__first-section {
+            display: flex;
+            flex-direction: column;
+            &-p-wrapper {
+                width: 100vw;
+                transform: translateY(0) translateX(0);
+
+                p {
+                    font-size: 35px;
+                    text-align: justify;
+                    padding: 10px 50px;
+                    line-height: 50px;
+                    letter-spacing: 5px;
+                }
+            }
+
+            &-logo-small-devices{
+                width: 100vw;
+                height: 30vh;
+                display: inline;
+                img{
+                    height: 100%;
+                    width: 100%;
+                    object-fit: cover;
+                    padding: 20px 50px;
+                }
+            }
+            &-logo-wrapper {
+                display: none;
+            }
+        }
+    }
+}
+
+
+
+@keyframes glitchEffect {
+    0% {
+        opacity: 1;
+        transform: rotate(90deg) translate(0, 0);
+        /* Posición original */
+    }
+
+    10% {
+        opacity: 0;
+        /* Desaparece bruscamente */
+    }
+
+    20% {
+        opacity: 1;
+        transform: rotate(90deg) translate(-1px, 1px);
+        /* Se mueve a una nueva posición bruscamente */
+    }
+
+    30% {
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 1;
+        transform: rotate(90deg) translate(1px, -1px);
+        /* Aparece en otra posición */
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    60% {
+        opacity: 1;
+        transform: rotate(90deg) translate(-5px, -1px);
+    }
+
+    70% {
+        opacity: 0;
+    }
+
+    80% {
+        opacity: 1;
+        transform: rotate(90deg) translate(1px, 5px);
+    }
+
+    90% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+        transform: rotate(90deg) translate(0, 0);
+        /* Vuelve a la posición original */
+    }
+}

@@ -1,0 +1,137 @@
+.shopping-cart-card {
+  font-family: 'Permanent Marker', cursive;
+  margin-bottom: 30px;
+  transform: translateX(-1vw);
+  display: flex;
+  color: #000000;
+
+  &__image-wrapper {
+
+    /* Estilos para el contenedor de la imagen */
+    img {
+      height: 20vw;
+      width: 20vw;
+      margin: auto;
+      border-radius: 5px; 
+      object-fit: cover;
+    }
+  }
+
+  &__text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-left: 20px;
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  &__details-container {
+    justify-content: center;
+    text-align: left;
+    margin-top: 10px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 15px;
+  }
+
+  &__color-container {
+    margin-top: 10px;
+
+    & img {
+      width: 22px;
+      height: 22px;
+      transform: translateY(5px);
+      background-color: #eee;
+      /* Asegúrate de que la imagen tenga un fondo visible */
+      border-radius: 50%;
+      /* Asegúrate de que el estilo sea visible */
+      border: 2px solid #000000;
+      /* Añadir un borde para ver el contorno */
+    }
+  }
+
+  &__size-container {
+    margin-top: 10px;
+  }
+
+  &__price-container {
+    margin-top: 10px;
+  }
+
+  &__counter-container {
+    display: flex;
+    margin-top: 10px;
+
+    label {
+      margin-right: 5px;
+    }
+
+    button {
+      all: unset;
+      color: brown;
+      cursor: pointer;
+      /* Agregado para indicar interactividad */
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .shopping-cart-card {
+    margin-bottom: 10px;
+
+    &__image-wrapper {
+      img {
+        height: 44vw;
+        width: 44vw;
+        margin: 10% auto;
+        border-radius: 5px;
+      }
+    }
+    &__text-container {
+      font-size: 16px;
+    }
+    &__details-container {
+      font-size: 13px;
+    }
+  }
+}
+
+  /* iPad Air (820 x 1180 px) */
+/* iPad Air (820 x 1180 px) y iPad Pro (1024 x 1366 px) */
+@media only screen and (min-width: 820px) and (max-width: 1024px) and (min-height: 1180px) and (max-height: 1266px) {
+  .shopping-cart-card {
+    &__image-wrapper {
+      img {
+        height: 35vw;
+        width: 35vw;
+      }
+    }
+  }
+}
+
+@media only screen and (min-width: 820px) and (max-width: 1024px) and (min-height: 1267px) and (max-height: 1366px) {
+  .shopping-cart-card {
+    &__image-wrapper {
+      img {
+        height: 25vw;
+        width: 25vw;
+      }
+    }
+  }
+}
+
+
+
+@media only screen and (min-width: 1180px) and (max-width: 1366px) and (min-height: 820px) and (max-height: 1024px) {
+  .shopping-cart-card {
+    &__image-wrapper {
+      img{
+        height: 20vw;
+        width: 20vw;
+      }
+    }
+  }
+}

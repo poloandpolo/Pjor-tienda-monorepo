@@ -1,0 +1,96 @@
+.checkout-page {
+    width: 100vw;
+    min-height: 100vh;
+    position: relative;
+    background-color: rgb(255, 255, 255);
+    background-image: url('/src/images/background-checkout.JPG');
+    background-size: cover;
+}
+
+.checkout-page__main-content {
+    display: flex;
+}
+
+.checkout-page__details {
+    width: 60vw;
+    height: 25vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    position: relative;
+
+    &-address-label {
+        margin: auto;
+        font-size: 32px;
+        font-family: Permanent Marker;
+        color: black;
+
+    }
+
+    &-add-address-label {
+        margin: auto;
+        font-family: Permanent Marker;
+        font-size: 25px;
+        color: brown;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.checkout-page__details-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Permanent Marker;
+    font-size: 22px;
+
+    .checkout-page__shipping-button{
+        margin-right: 8px;
+        height: 120%;
+        width: 10%;
+        text-align: center;
+        justify-content: center ;
+        align-items: center;
+        padding: 1px;
+        transform: translateY(10px);
+    }
+
+    .checkout-page__payment-button{
+        height: 120%;
+        width: 10%;
+        text-align: center;
+        justify-content: center ;
+        align-items: center;
+        padding: 1px;
+        transform: translateY(10px);
+
+    }
+
+    .checkout-page__confirmation-button{
+        height: 4vw;
+        width: 20%;
+        right: 0;
+        position: absolute;
+        text-align: center;
+        justify-content: center ;
+        align-items: center;
+        padding: 1px;
+        transform: translateY(10px) translateX(-20px);
+        color: brown;
+
+    }
+    
+}
+
+
+.checkout-page__cards {
+    width: 42vw;
+    right: 0;
+    position: relative;
+    padding-top: 20px;
+    padding-left: 40px;
+    border-left: 3px solid rgba(0, 0, 0, 0.062);
+    background-color: rgba(94, 94, 94, 0.089);
+}

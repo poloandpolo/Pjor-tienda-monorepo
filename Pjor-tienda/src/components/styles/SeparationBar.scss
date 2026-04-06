@@ -1,0 +1,37 @@
+.separation-bar {
+    height: 45px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+
+    &__image-wrapper {
+        height: 100%;
+        width: 130px; /* Define que el ancho de cada wrapper sea un 17% del total */
+        margin-right:27px;
+        
+        
+        & img {
+            width: 130px;
+            height: 100%;
+            object-fit: fill; /* Mantén la imagen dentro del contenedor */
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .separation-bar {
+        height: 28px;
+
+        &__image-wrapper {
+            width: 75px;
+            margin-right: 10px;
+
+            & img{
+                width: 75px;
+            }
+        }
+    }
+
+}

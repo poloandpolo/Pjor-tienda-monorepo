@@ -1,0 +1,65 @@
+.payment-error-modal {
+    &__overlay {
+        position: fixed;
+        top: 12.9%;
+        left: 50%;
+        width: 30vw;
+        height: 3vh;
+        z-index: 1500;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        transform: translateX(-50%);
+
+        &--open {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+
+    &__content {
+        background-color: rgba(252, 252, 252, 0.966);
+        padding: 20px;
+        border-radius: 17px;
+        width: 30vw;
+        height: 3vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-family: 'Permanent Marker', cursive;
+        font-size: 20px;
+        z-index: 1500;
+        color: black;
+
+        img {
+            width: 30px;
+            height: 30px;
+            margin-right: 2px;
+        }
+
+        p {
+            margin: 0; // Remover margen
+        }
+    }
+}
+
+// Media query para pantallas más pequeñas
+@media (max-width: 768px) {
+    .confirmation-modal {
+        &__overlay {
+            height: 5vw;
+            width: 80vw;
+            top: 20%; // Ajusta la posición vertical
+        }
+
+        &__content {
+            height: 5vw;
+            width: 80vw;
+            font-size: 16px; // Ajusta el tamaño de fuente para dispositivos móviles
+        }
+    }
+}

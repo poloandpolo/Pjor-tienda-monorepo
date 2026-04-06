@@ -1,0 +1,72 @@
+.clothing-bar {
+    display: flex;
+    position: relative;
+    width: 22%;
+    flex-direction: column;
+    height: 90%;
+    padding-left: 3vw;
+    padding-right: 10px; /* Espacio extra para el contenido */
+    opacity: 0;
+    transform: translateX(-100%); /* Inicialmente oculta fuera de la vista */
+    overflow-y: scroll;
+    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-color: black transparent; /* Color de la barra */
+  
+    /* Para navegadores basados en WebKit como Chrome, Safari y Edge */
+    &::-webkit-scrollbar {
+      width: 8px; /* Grosor de la barra */
+    }
+  
+    &::-webkit-scrollbar-track {
+      background: transparent; /* Fondo transparente */
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background-color: black; /* Color de la barra */
+      border-radius: 4px; /* Bordes redondeados */
+    }
+  
+    &::-webkit-scrollbar-button {
+      display: none; /* Elimina las flechas de arriba y abajo */
+    }
+  
+    &--show {
+      opacity: 1;
+      transform: translateX(0); /* Mueve la barra a su posición visible */
+      position: fixed;
+      width: 25%;
+      z-index: 500;
+    }
+  
+    &__close-button {
+      all: unset;
+      display: flex;
+      position: absolute;
+      font-family: 'Permanent Marker', cursive;
+      color: brown;
+      transform: translateX(19vw) translateY(-1vw);
+      font-size: 32px;
+      z-index: 1000;
+      transition: transform 0.3s ease-in-out;
+    }
+  
+    /* Media query para pantallas pequeñas */
+    @media (max-width: 768px) {
+      
+  
+      &--show {
+        display: flex;
+        position: fixed;
+        width: 32%;
+        height: 90%;
+        z-index: 500;
+        opacity: 1;
+        transform: translateX(0); /* Asegura que se muestre correctamente en pantallas pequeñas */
+      }
+  
+      &__close-button {
+        transform: translateX(23.3vw) translateY(-2vw);
+      }
+    }
+  }
+  

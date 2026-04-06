@@ -1,0 +1,99 @@
+.profile-info {
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 12px;
+    transform: translateY(-25px);
+
+    &__back-button{
+        all: unset;
+        height: 45px;
+        background-color: black;
+        color: white;
+        font-family: Permanent Marker;
+        transition: box-shadow 0.3s ease-in-out;
+        width: 150px;
+        text-align: center;
+        border-radius: 15px;
+        transform: translateY(-20px);
+        font-size: 17.5px;
+    }
+
+    &__section {
+        height: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        margin-top: 12px;
+    }
+
+    &__label {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+
+    &-button-wrapper{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+
+        & label {
+            font-family: Permanent Marker;
+            color: black;
+            font-size: 22px;
+        }
+
+        & button {
+            all: unset;
+            color: brown;
+            font-family: Barlow Condensed;
+            margin-left: 10px;
+            transform: translateY(-3px);
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    /* Estilo global para los inputs */
+    & input {
+        all: unset;
+        font-size: 20px;
+        font-family: Barlow Condensed;
+        color: black;
+        text-align: center;
+        border-radius: 13px;
+        width: 40%;
+        margin-left: 10px;
+        line-height: 35px;
+    }
+
+    /* Estilo específico para el placeholder */
+    & input::placeholder {
+        color: black;  /* Cambia el color del placeholder a negro */
+        opacity: 1;  /* Asegura que el color sea completamente visible */
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-info {
+        &__label {
+            & label{
+                font-size: 17px;
+            }
+
+            & input {
+                font-size: 17px;
+            }
+
+            & button {
+                font-size: 13px;
+            }
+        }
+    }
+}

@@ -1,0 +1,151 @@
+.address-form__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Fondo semi-transparente */
+  z-index: 1000;  
+  /* Asegúrate de que el modal esté por encima del contenido */
+  opacity: 0;
+  /* Oculto inicialmente */
+  visibility: hidden;
+  /* Ocultar completamente cuando no está visible */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  /* Transición suave */
+}
+
+.address-form__overlay--show {
+  opacity: 1;
+
+}
+
+.address-form__close-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.address-form__close-button {
+  all: unset;
+  font-family: Permanent Marker;
+  color: brown;
+  font-size: 30px;
+  position: absolute;
+  z-index: 1000;
+}
+
+.address-form__overlay.--show {
+  opacity: 1;
+  /* Visible */
+  visibility: visible;
+  /* Mostrar el overlay */
+}
+
+.address-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* Para que cada campo ocupe el 100% */
+  gap: 20px;
+  padding: 30px;
+  border-radius: 15px;
+  background-color: white;
+  margin: 20px;
+
+  h2 {
+    color: black;
+    font-family: 'Permanent Marker', cursive;
+    text-align: center;
+  }
+
+  &__name-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Dos columnas */
+    gap: 20px;
+  }
+
+  &__name,
+  &__lastname {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    input {
+      padding: 10px;
+      font-size: 17px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      font-family: Barlow Condensed;
+
+      &::placeholder {
+        color: #aaa;
+      }
+
+      &:focus {
+        border-color: #007bff;
+      }
+    }
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+
+    input {
+      padding: 10px;
+      font-size: 17px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      font-family: Barlow Condensed;
+    }
+  }
+
+  &__city-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    /* Tres columnas */
+    gap: 20px;
+  }
+
+  &__city-details-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    input {
+      padding: 10px;
+      font-size: 17px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      font-family: Barlow Condensed;
+    }
+  }
+
+  &__submit {
+    padding: 10px;
+    font-size: 16px;
+    color: white;
+    background-color: #000000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Barlow Condensed;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+
+  &__error {
+    color: red;
+    font-size: 12px;
+  }
+}

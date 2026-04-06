@@ -1,0 +1,26 @@
+.clothing-bar__checkbox-wrapper {
+    font-size: 22px;
+    letter-spacing: 3px;
+    font-family: 'Permanent Marker', cursive;
+    width: 100%;
+    margin: 15px 0;
+    color: black;
+
+    .clothing-bar__checkbox {
+        margin: 0 5%; /* Ajusta el margin como necesites */
+    }
+}
+
+@media (max-width: 768px) {
+    .clothing-bar__checkbox-wrapper {
+        font-size: 15px;
+        letter-spacing: 0;
+        font-family: 'Permanent Marker', cursive;
+        width: 100%;
+        margin: 15px 0;
+    }
+
+    .clothing-bar__checkbox {
+        margin: 0 3%; /* Ajusta el margin en pantallas pequeñas */
+    }
+}

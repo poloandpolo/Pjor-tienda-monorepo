@@ -1,0 +1,44 @@
+/* styles/LandingPageButton.scss */
+
+.landing-page-button {
+    &__button {
+      all: unset;
+      background-color: rgba(0, 0, 0, 0.685);
+      height: 6vh;
+      width: 150px;
+      color: beige;
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transition: background-color 0.3s;
+  
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.8); /* Cambia el color al pasar el cursor */
+        outline: 1.5px solid beige;
+      }
+    }
+  
+    & {
+      &__wrapper {
+        background-color: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .landing-page-button {
+      &__button {
+        height: 4vh;
+        width: 80px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+  

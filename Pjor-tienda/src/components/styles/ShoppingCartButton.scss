@@ -1,0 +1,37 @@
+.shopping-cart-button {
+    &__icon {
+      position: fixed;
+      background-color: white;
+      padding: 2px;
+      top: 50%;
+      left: 0;
+      transform: translateY(120%);
+      
+      border-radius: 10px;
+      height: 2.5vw;
+      width: 2.5vw;
+    }
+  
+    &__container--hide {
+      display: none;
+    }
+  
+    @media (max-width: 768px) {
+      &__icon {
+        height: 8.5vw;
+        width: 8.5vw;
+      }
+    }
+  }
+
+  @media only screen and (min-width: 820px) and (max-width: 1024px) and (min-height: 1180px) and (max-height: 1366px) {
+    .shopping-cart-button{
+      &__icon{
+        height: 6vw;
+        width: 6vw;
+      }
+    }
+    
+    
+  }
+  

@@ -1,0 +1,33 @@
+.clothing-gallery {
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas para los pares */
+    gap: 16px; /* Espacio entre las tarjetas */
+    transform: translateX(8.6vw);
+    transition: transform 0.5s ease, width 0.5s ease; /* Transición añadida */
+}
+
+/* Modificador para cuando la barra de ropa está abierta */
+.clothing-gallery--with-clothing-bar {
+    width: 75vw;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas para pantallas más grandes */
+    transform: translateX(24vw);
+    gap: 0; /* Espacio entre las tarjetas */
+}
+
+/* Media query para pantallas más pequeñas */
+@media (max-width: 768px) {
+    .clothing-gallery {
+        width: 100vw;
+        grid-template-columns: 1fr; /* 1 columna para pantallas más pequeñas */
+        transform: translateX(10vw);
+        transition: transform 0.8s ease, width 1s ease; /* Transición añadida */
+    }
+
+    .clothing-gallery--with-clothing-bar {
+        width: 100vw;
+        grid-template-columns: 1fr; /* 1 columna para pantallas más pequeñas */
+        transform: translateX(32vw);
+        transition: transform 1.1s ease, width 10000s ease; /* Transición añadida */
+    }
+}

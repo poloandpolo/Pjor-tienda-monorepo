@@ -1,0 +1,76 @@
+/* styles/SizeModal.scss */
+
+.modal-size {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+
+  &--show {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  &__content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 80%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Permanent Marker', sans-serif;
+  }
+
+  &__sizes-wrapper {
+    justify-content: space-between;
+    width: 100%;
+    display: flex;
+  }
+
+  &__size-option {
+    &:hover {
+      background-color: rgba(175, 175, 175, 0.39);
+      border-radius: 5px;
+    }
+  }
+
+  &__close-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__close-button {
+    all: unset;
+    cursor: pointer;
+    font-family: 'Permanent Marker', sans-serif;
+    color: brown;
+    position: relative;
+    top: -10px;
+    /* Ajusta para alinear con el de ColorModal */
+    right: -10px;
+    /* Ajusta para alinear con el de ColorModal */
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-size {
+    &__content {
+      font-size: 15px;
+    }
+  }
+}

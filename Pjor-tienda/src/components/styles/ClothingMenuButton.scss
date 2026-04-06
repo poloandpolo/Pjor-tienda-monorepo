@@ -1,0 +1,38 @@
+/* styles/ClothingMenuButton.scss */
+.clothing-menu-button {
+    &--visible {
+      position: fixed;
+      border-radius: 10px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-150%);
+      font-family: 'Permanent Marker', cursive;
+      background-color: white;
+      height: 2.5vw;
+      width: 2.5vw;
+      font-size: 20px;
+    }
+  
+    &--hidden {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .clothing-menu-button {
+      &--visible {
+        height: 8vw;
+        width: 8vw;
+      }
+    }
+  }
+  
+  @media only screen and (min-width: 820px) and (max-width: 1024px) and (min-height: 1180px) and (max-height: 1366px) {
+    .clothing-menu-button{
+    &--visible{
+      height: 6vw;
+      width: 6vw;
+      font-size: 32px;
+    }
+  }
+  }

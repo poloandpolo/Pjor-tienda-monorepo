@@ -1,0 +1,96 @@
+.shopping-cart {
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+    flex-direction: column;
+
+    &--show {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  &__content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    height: 100vh; /* Ajusta la altura máxima del modal para permitir espacio para desplazamiento */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  &__title {
+    font-family: 'Permanent Marker', cursive;
+    margin: auto;
+    color: black;
+  }
+
+  &__close-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  &__close-button {
+    all: unset;
+    display: flex;
+    position: absolute;
+    font-family: 'Permanent Marker', cursive;
+    color: brown;
+    z-index: 1000;
+    font-size: 30px;
+  }
+
+  &__items {
+    flex: 1;
+    overflow-y: auto; /* Permite el desplazamiento vertical */
+    margin-top: 10px;
+
+    /* Estilo para navegadores basados en WebKit */
+    &::-webkit-scrollbar {
+      width: 6px; /* Ancho del scrollbar */
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent; /* Fondo del track */
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: black; /* Color del scrollbar */
+      border-radius: 4px; /* Bordes redondeados */
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: #555; /* Color al pasar el mouse */
+    }
+
+    /* Opcional: Estilo para Firefox */
+    scrollbar-width: thin; /* Scrollbar delgado */
+    scrollbar-color: black transparent; /* Colores para el scrollbar y el track */
+  }
+}
+
+@media (max-width: 768px) {
+  .shopping-cart {
+    &__title {
+      font-size: 20px;
+    }
+    &__content {
+      width: 90%;
+    }
+  }
+}

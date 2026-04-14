@@ -11,6 +11,7 @@
     z-index: 1000;
     opacity: 0 ;
     visibility: hidden;
+    transition: ease 0.5s;
 }
 
 .payment-modal__overlay--shown{
@@ -25,6 +26,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    transition: ease 0.4s;
 }
 
 .payment-modal__form {

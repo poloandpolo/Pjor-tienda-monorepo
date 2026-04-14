@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './styles/PaymentModal.scss';
 import { loadStripe } from '@stripe/stripe-js';
+import { useMenPageContext } from '../context/MenPageContext'; // 🔥 AÑADIDO
 
-// 🔥 Stripe correcto
 const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
 
-export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
+export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentError }) => {
+
+  const { fetchPaymentMethods } = useMenPageContext(); // 🔥 AÑADIDO
 
   const handleCloseClick = () => {
     closePaymentModal();
@@ -33,14 +35,12 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
     },
   });
 
-  // 🔥 INIT STRIPE BIEN
   useEffect(() => {
     const initStripe = async () => {
       const stripe = await stripePromise;
       stripeRef.current = stripe;
 
       elementsRef.current = stripe.elements();
-
       cardRef.current = elementsRef.current.create('card');
       cardRef.current.mount('#card-element');
     };
@@ -79,12 +79,18 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
     e.preventDefault();
     setError(null);
 
+    const token = localStorage.getItem('jwt');
+
     try {
       const response = await fetch('http://localhost:3000/api/payments/create-setup-intent', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 1 }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
+
+      console.log(token)
 
       const { clientSecret } = await response.json();
 
@@ -113,14 +119,29 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
         return;
       }
 
-      await fetch('http://localhost:3000/api/payments/save-payment-method', {
+      const saveResponse = await fetch('http://localhost:3000/api/payments/save-payment-method', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // 🔥 AQUÍ VA
+        },
         body: JSON.stringify({
-          userId: 1,
-          paymentMethodId: result.setupIntent.payment_method,
+          paymentMethodId: result.setupIntent.payment_method, // 🔥 SOLO ESTO
         }),
       });
+
+      if (saveResponse.status === 409) {
+        console.log('Tarjeta ya registrada');
+        onPaymentError();
+        return;
+      }
+
+      if (!saveResponse.ok) {
+        throw new Error('Error guardando método de pago');
+      }
+
+      // 🔥 AQUÍ ESTÁ LA CLAVE
+      await fetchPaymentMethods(); // refresca lista automáticamente
 
       setSuccess(true);
       setError(null);
@@ -145,7 +166,6 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
 
         <h2>Añadir metodo de pago</h2>
 
-        {/* ✅ RESPETANDO TUS CLASES */}
         <div className="payment-modal__input-group">
           <input type="text" name="firstName" value={billingDetails.firstName} onChange={handleInputChange} placeholder="Nombre" />
         </div>
@@ -186,9 +206,7 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
           <input type="text" name="address.country" value={billingDetails.address.country} onChange={handleInputChange} placeholder="MX" />
         </div>
 
-        {/* 🔥 Stripe element también con tu clase */}
-          <div id="card-element"></div>
-        
+        <div id="card-element"></div>
 
         <div id="card-errors">
           {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -199,7 +217,6 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal }) => {
 
       </form>
 
-      
     </div>
   );
 };

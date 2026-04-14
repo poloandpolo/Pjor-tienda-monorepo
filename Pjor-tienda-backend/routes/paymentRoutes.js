@@ -1,16 +1,21 @@
 const express = require('express');
 const PaymentController = require('../controllers/paymentController');
+const verifyToken = require('../middlewares/verifyToken'); // 🔥 IMPORTANTE
 
 const router = express.Router();
 
-// Ruta para crear PaymentIntent
+// Crear PaymentIntent
 router.post('/create-payment-intent', PaymentController.createPaymentIntent);
 
-// Ruta para consultar el estado de un pago
+// Estado de pago
 router.get('/payment-status/:id', PaymentController.getPaymentStatus);
 
-router.post('/create-setup-intent', PaymentController.createSetupIntent);
+// SetupIntent
+router.post('/create-setup-intent', verifyToken, PaymentController.createSetupIntent);
 
-router.post('/save-payment-method', PaymentController.savePaymentMethod);
+// Guardar método de pago
+router.post('/save-payment-method', verifyToken, PaymentController.savePaymentMethod);
+
+router.get('/payment-methods', verifyToken, PaymentController.getPaymentMethods);
 
 module.exports = router;

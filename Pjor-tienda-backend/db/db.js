@@ -1,4 +1,3 @@
-// db/db.js
 const knex = require('knex');
 const knexConfig = require('../knexfile');
 

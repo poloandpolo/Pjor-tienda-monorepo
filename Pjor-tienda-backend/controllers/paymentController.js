@@ -4,16 +4,17 @@ const db = require('../db/db.js');
 
 class PaymentController {
 
-  // 🔥 EXISTENTE (mantenido, solo extendido opcionalmente)
+  // 🔥 EXISTENTE (ajustado a JWT opcional)
   static async createPaymentIntent(req, res) {
-    const { amount, currency, userId, paymentMethodId } = req.body;
+    const { amount, currency, paymentMethodId } = req.body;
+    const userId = req.userId; // 🔥 ahora viene del middleware
 
     if (!amount || !currency) {
       return res.status(400).json({ error: "Faltan parámetros necesarios" });
     }
 
     try {
-      // 👉 Si NO mandas userId → usa flujo viejo (compatible)
+      // 👉 flujo viejo si no hay usuario autenticado
       if (!userId) {
         const { clientSecret, paymentId } =
           await PaymentModel.createPaymentIntent(amount, currency);
@@ -21,7 +22,6 @@ class PaymentController {
         return res.status(200).json({ clientSecret, paymentId });
       }
 
-      // 👉 Si mandas userId → usa tarjetas guardadas (flujo nuevo)
       const user = await db('users').where({ id: userId }).first();
 
       if (!user || !user.stripe_customer_id) {
@@ -70,9 +70,9 @@ class PaymentController {
     }
   }
 
-  // 🔥 NUEVO → crear SetupIntent (guardar tarjeta)
+  // 🔥 AJUSTADO → usa JWT en lugar de body
   static async createSetupIntent(req, res) {
-    const { userId } = req.body;
+    const userId = req.userId;
 
     try {
       const user = await db('users').where({ id: userId }).first();
@@ -83,7 +83,6 @@ class PaymentController {
 
       let stripeCustomerId = user.stripe_customer_id;
 
-      // crear customer si no existe
       if (!stripeCustomerId) {
         const customer = await stripe.customers.create({
           email: user.email,
@@ -107,27 +106,47 @@ class PaymentController {
     }
   }
 
-  // 🔥 NUEVO → guardar método de pago
   static async savePaymentMethod(req, res) {
+  const userId = req.userId;
+  const { paymentMethodId } = req.body;
 
-  const { userId, paymentMethodId } = req.body;
+  if (!paymentMethodId) {
+    return res.status(400).json({ error: "paymentMethodId requerido" });
+  }
 
   try {
-    const result = await PaymentModel.savePaymentMethod(userId, paymentMethodId);
+    const paymentMethod = await PaymentModel.savePaymentMethod(
+      userId,
+      paymentMethodId
+    );
 
-    return res.json(result);
+    return res.json(paymentMethod);
 
   } catch (error) {
 
     if (error.code === 'PAYMENT_METHOD_EXISTS') {
-      console.log('xD Tarjeta ya registrada');
-
       return res.status(409).json({ error: error.code });
     }
 
     return res.status(500).json({ error: error.message });
   }
 }
+
+  // 🔥 NUEVO → obtener métodos del usuario autenticado
+  static async getPaymentMethods(req, res) {
+    const userId = req.userId;
+
+    try {
+      const paymentMethods = await db('payment_methods')
+        .where({ user_id: userId })
+        .orderBy('created_at', 'desc');
+
+      return res.json(paymentMethods);
+
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = PaymentController;

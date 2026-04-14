@@ -71,6 +71,7 @@ export const MenPageContextProvider = ({ children }) => {
   // Estado y lógica para las direcciones
   const [addresses, setAddresses] = useState([]);
   const [error, setError] = useState(null);
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   const fetchAddresses = async () => {
     const token = localStorage.getItem('jwt');
@@ -106,6 +107,40 @@ export const MenPageContextProvider = ({ children }) => {
     fetchAddresses().catch((err) => console.error(err));
   }, []);
 
+  const fetchPaymentMethods = async () => {
+    const token = localStorage.getItem('jwt');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/payments/payment-methods', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        setPaymentMethods(data);
+        return data;
+      } else {
+        setPaymentMethods([]);
+        return [];
+      }
+
+    } catch (err) {
+      setError('Error al cargar métodos de pago');
+      console.error(err);
+      throw new Error('Error al cargar métodos de pago');
+    }
+  };
+
+  useEffect(() => {
+    fetchPaymentMethods().catch((err) => console.error(err));
+  }, []);
+
+
   return (
     <MenPageContext.Provider
       value={{
@@ -116,7 +151,9 @@ export const MenPageContextProvider = ({ children }) => {
         updateItemQuantity,
         addresses,
         error,
-        fetchAddresses, // Exponer la función
+        fetchAddresses,
+        paymentMethods,
+        fetchPaymentMethods, 
       }}
     >
       {children}

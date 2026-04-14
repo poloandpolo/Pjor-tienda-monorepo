@@ -67,14 +67,42 @@ class PaymentModel {
     }
   }
 
-  // 🔥 NUEVO → guardar método de pago con fingerprint
-  static async savePaymentMethod(userId, paymentMethodId) {
+  // 🔥 AJUSTADO → robusto + limpio
+ static async savePaymentMethod(userId, paymentMethodId) {
+  try {
+    // 🔥 1. Obtener usuario
+    const user = await db('users')
+      .where({ id: userId })
+      .first();
 
-    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+    if (!user || !user.stripe_customer_id) {
+      throw new Error('Usuario sin customer en Stripe');
+    }
+
+    const customerId = user.stripe_customer_id;
+
+    // 🔥 2. Obtener PaymentMethod
+    let paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+
+    if (!paymentMethod.card) {
+      throw new Error('El método de pago no es una tarjeta válida');
+    }
+
+    // 🔥 3. Si no está adjunto → attach
+    if (!paymentMethod.customer) {
+      paymentMethod = await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: customerId,
+      });
+    }
+
+    // 🔥 4. Validar ownership (crítico)
+    if (paymentMethod.customer !== customerId) {
+      throw new Error('El método de pago no pertenece al usuario');
+    }
 
     const fingerprint = paymentMethod.card.fingerprint;
 
-    // 🔥 validar duplicado real
+    // 🔥 5. Validar duplicado lógico
     const existing = await db('payment_methods')
       .where({
         user_id: userId,
@@ -83,34 +111,39 @@ class PaymentModel {
       .first();
 
     if (existing) {
-      console.log('⚠️ Tarjeta ya registrada');
-      throw { code: 'PAYMENT_METHOD_EXISTS' };
+      const error = new Error('Payment method already exists');
+      error.code = 'PAYMENT_METHOD_EXISTS';
+      throw error;
     }
 
-    try {
-      await db('payment_methods').insert({
+    // 🔥 6. Guardar en DB
+    const [newPaymentMethod] = await db('payment_methods')
+      .insert({
         user_id: userId,
         stripe_payment_method_id: paymentMethod.id,
-        stripe_customer_id: paymentMethod.customer,
+        stripe_customer_id: customerId,
         fingerprint,
         brand: paymentMethod.card.brand,
         last4: paymentMethod.card.last4,
         exp_month: paymentMethod.card.exp_month,
         exp_year: paymentMethod.card.exp_year,
-      });
+      })
+      .returning('*');
 
-      return { message: "Método de pago guardado" };
+    return newPaymentMethod;
 
-    } catch (error) {
+  } catch (error) {
 
-      if (error.code === 'ER_DUP_ENTRY') {
-        console.log('⚠️ Duplicado detectado por DB');
-        throw { code: 'PAYMENT_METHOD_EXISTS' };
-      }
-
-      throw error;
+    // 🔥 Duplicado por constraint DB
+    if (error.code === '23505') {
+      const err = new Error('Payment method already exists');
+      err.code = 'PAYMENT_METHOD_EXISTS';
+      throw err;
     }
+
+    throw error;
   }
+}
 
 }
 

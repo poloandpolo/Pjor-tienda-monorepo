@@ -8,21 +8,26 @@ import { AddressesList } from '../components/AddressesList';
 import { useNavigate } from 'react-router-dom';
 import { PaymentsList } from '../components/PaymentsList';
 import { PaymentModal } from '../components/PaymentModal';
-import {PaymentErrorModal} from '../components/PaymentErrorModal'
+import { PaymentErrorModal } from '../components/PaymentErrorModal';
 
 const CheckoutPage = () => {
   const { cartItems } = useMenPageContext();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [paymentModalOpen, setpaymentModalOpen] = useState(true)
-  const [activeSection, setActiveSection] = useState('shipping'); // Estado para manejar la sección activa
-  const addressesListRef = useRef();
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [paymentModalOpen, setpaymentModalOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('shipping');
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+
+  const addressesListRef = useRef();
+  const paymentsListRef = useRef(); // 🔥 NUEVO
 
   const navigate = useNavigate();
 
   const closeModal = () => setModalOpen(false);
   const openModal = () => setModalOpen(true);
+
   const closePaymentModal = () => setpaymentModalOpen(false);
+  const openPaymentModal = () => setpaymentModalOpen(true); // 🔥 NUEVO
 
   const handleAddressSubmit = (data) => {
     console.log(data);
@@ -34,18 +39,42 @@ const CheckoutPage = () => {
     }
   };
 
-  const cartCards = cartItems.map((item) => <ShoppingCartCard key={item.id} item={item} />);
+  const cartCards = cartItems.map((item) => (
+    <ShoppingCartCard key={item.id} item={item} />
+  ));
+
   const handleStoreClick = () => navigate(-1);
 
   return (
     <div className="checkout-page">
       <CheckoutHeader onClickStore={handleStoreClick} />
+
       {/* Modal de dirección */}
-      <AddressForm onSubmit={handleAddressSubmit} modalOpen={modalOpen} closeModal={closeModal} />
-      <PaymentModal paymentModalOpen={paymentModalOpen} closePaymentModal={closePaymentModal}/>
-      <PaymentErrorModal/>
+      <AddressForm
+        onSubmit={handleAddressSubmit}
+        modalOpen={modalOpen}
+        closeModal={closeModal}
+      />
+
+      {/* Modal de pago */}
+      <PaymentModal
+        paymentModalOpen={paymentModalOpen}
+        closePaymentModal={closePaymentModal}
+        onPaymentError={() => {
+          setErrorModalOpen(true);
+
+          setTimeout(() => {
+            setErrorModalOpen(false);
+          }, 3000);
+        }}
+      />
+
+      {/* Error modal */}
+      <PaymentErrorModal isOpen={errorModalOpen} />
+
       <div className="checkout-page__main-content">
         <div className="checkout-page__details">
+
           <div className="checkout-page__details-buttons-wrapper">
             <button
               className={`checkout-page__shipping-button ${activeSection === 'shipping' ? 'active' : ''}`}
@@ -53,23 +82,40 @@ const CheckoutPage = () => {
             >
               envío
             </button>
+
             <button
               className={`checkout-page__payment-button ${activeSection === 'payment' ? 'active' : ''}`}
               onClick={() => setActiveSection('payment')}
             >
               pago
             </button>
-            <button className="checkout-page__confirmation-button">Confirmar</button>
+
+            <button className="checkout-page__confirmation-button">
+              Confirmar
+            </button>
           </div>
 
           {/* Renderizado condicional */}
-          {activeSection === 'shipping' && <AddressesList ref={addressesListRef} openModal={openModal} />}
-          {activeSection === 'payment' && <PaymentsList />}
+          {activeSection === 'shipping' && (
+            <AddressesList
+              ref={addressesListRef}
+              openModal={openModal}
+            />
+          )}
+
+          {activeSection === 'payment' && (
+            <PaymentsList
+              ref={paymentsListRef}          
+              openModal={openPaymentModal} 
+            />
+          )}
+
         </div>
 
-        <div className="checkout-page__cards">{cartCards}</div>
+        <div className="checkout-page__cards">
+          {cartCards}
+        </div>
       </div>
-      
     </div>
   );
 };

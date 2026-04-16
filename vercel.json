@@ -1,8 +1,0 @@
-{
-  "routes": [
-    {
-      "src": "^/api/(.*)",
-      "dest": "https://pjor-backend.onrender.com/$1"
-    }
-  ]
-}

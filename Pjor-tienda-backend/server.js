@@ -10,8 +10,11 @@ const app = express();
 
 // Habilitar CORS para permitir solicitudes desde http://localhost:5173
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true, // Cambiar según tu entorno
+  origin: [
+    'http://localhost:5173',
+    'https://pjor-tienda-monorepo.vercel.app'
+  ],
+  credentials: true
 }));
 
 // Middleware para parsear JSON

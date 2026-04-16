@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -9,48 +8,30 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-// 🔥 ORÍGENES PERMITIDOS
-const allowedOrigins = [
-  'http://localhost:5173',
-];
+// 🔥 CORS MANUAL (SOLUCIÓN DEFINITIVA)
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+  if (
+    origin?.includes('vercel.app') ||
+    origin === 'http://localhost:5173'
+  ) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
 
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.includes('.vercel.app') // 🔥 CLAVE
-    ) {
-      return callback(null, true);
-    }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
+  // 🔥 RESPUESTA INMEDIATA A PREFLIGHT
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
 
-app.options('*', cors());
+  next();
+});
 
-// 🔥 CORS CONFIGURADO CORRECTAMENTE
-app.use(cors({
-  origin: function (origin, callback) {
-    // Permitir requests sin origin (Postman, mobile apps, etc)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
-
-// 🔥 SOPORTE PARA PREFLIGHT (CRÍTICO)
-app.options('*', cors());
-
-// Middleware para parsear JSON
+// 🔥 JSON después de CORS
 app.use(express.json());
 
 // Rutas

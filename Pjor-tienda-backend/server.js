@@ -8,26 +8,36 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-// 🔥 LISTA EXACTA DE ORÍGENES
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://pjor-tienda-monorepo.vercel.app',
-  'https://pjor-tienda-monorepo-iynypokk8-agustin-condados-projects.vercel.app'
-];
-
+// 🔥 CORS ROBUSTO (dinámico + seguro)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (allowedOrigins.includes(origin)) {
+  // Permitir localhost y cualquier vercel.app
+  if (
+    origin === 'http://localhost:5173' ||
+    origin?.endsWith('.vercel.app')
+  ) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Vary', 'Origin'); // 🔥 IMPORTANTE para proxies
+
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET,POST,PUT,DELETE,OPTIONS'
+  );
+
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization'
+  );
+
+  // ⚠️ SOLO si realmente usas cookies / sesiones
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+  // 🔥 RESPUESTA PRE-FLIGHT SIEMPRE
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    return res.status(204).end();
   }
 
   next();
@@ -35,7 +45,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// DEBUG
+// 🔥 HEALTH CHECK (útil en Render)
 app.get('/', (req, res) => {
   res.send('Backend vivo');
 });
@@ -50,4 +60,6 @@ app.use('/api/orders', orderRoutes);
 // Puerto
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
+});

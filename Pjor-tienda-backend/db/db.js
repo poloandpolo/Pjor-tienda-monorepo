@@ -5,4 +5,10 @@ const env = process.env.NODE_ENV || 'development';
 
 const db = knex(knexConfig[env]);
 
+console.log('ENV:', process.env.NODE_ENV);
+
+db.raw('SELECT 1')
+  .then(() => console.log('✅ DB conectada'))
+  .catch(err => console.error('💥 DB ERROR:', err));
+
 module.exports = db;

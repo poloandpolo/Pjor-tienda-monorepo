@@ -1,22 +1,25 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = '/api'; // 🔥 esto activa el proxy de Vercel
 
 export const apiFetch = async (endpoint, options = {}) => {
-  const token = localStorage.getItem('jwt');
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+      ...options,
+    });
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
-  });
+    // 🔥 manejar errores correctamente
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error en la petición');
+    }
 
-  const data = await response.json();
+    return await response.json();
 
-  if (!response.ok) {
-    throw new Error(data?.message || 'Error en la petición');
+  } catch (error) {
+    console.error('API ERROR:', error.message);
+    throw error;
   }
-
-  return data;
 };

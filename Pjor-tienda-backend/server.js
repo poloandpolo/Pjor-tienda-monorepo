@@ -8,7 +8,7 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-// 🔥 CORS MANUAL (SOLUCIÓN DEFINITIVA)
+// 🔥 CORS MANUAL GLOBAL
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
@@ -23,16 +23,22 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  // 🔥 RESPUESTA INMEDIATA A PREFLIGHT
+  // 🔥 CLAVE: responder OPTIONS global
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    return res.status(200).end();
   }
 
   next();
 });
 
-// 🔥 JSON después de CORS
 app.use(express.json());
+
+// 🔥 FORZAR OPTIONS EN CADA BASE ROUTE
+app.options('/users', (req, res) => res.sendStatus(200));
+app.options('/auth', (req, res) => res.sendStatus(200));
+app.options('/api', (req, res) => res.sendStatus(200));
+app.options('/api/payments', (req, res) => res.sendStatus(200));
+app.options('/api/orders', (req, res) => res.sendStatus(200));
 
 // Rutas
 app.use('/users', userRoutes);

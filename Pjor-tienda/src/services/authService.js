@@ -8,7 +8,7 @@ export const loginUser = (data) => {
 };
 
 export const registerUser = (data) => {
-  return apiFetch('/users', {
+  return apiFetch('/', {
     method: 'POST',
     body: JSON.stringify(data),
   });

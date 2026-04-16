@@ -1,8 +1,8 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "https://pjor-backend.onrender.com/:path*"
+      "src": "^/api/(.*)",
+      "dest": "https://pjor-backend.onrender.com/$1"
     }
   ]
 }

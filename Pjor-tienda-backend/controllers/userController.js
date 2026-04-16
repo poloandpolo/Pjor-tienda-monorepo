@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
 
   } catch (error) {
 
-    console.error('Error al crear el usuario:', error.message);
+    console.error('🔥 ERROR COMPLETO:', error);
 
     return res.status(500).json({
       message: 'Error en el servidor.'

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { jwtDecode } from 'jwt-decode';
 import './styles/AccountModal.scss';
 import { ProfileInfo } from './ProfileInfo';
+import { loginUser, registerUser, updateUserPassword } from '../services/authService';
 
 export const AccountModal = ({ isVisible, onClose }) => {
 
@@ -100,107 +101,47 @@ export const AccountModal = ({ isVisible, onClose }) => {
   };
 
   const handleLoginClick = async (data) => {
-
     try {
+      const result = await loginUser(data);
 
-      const response = await fetch('http://localhost:3000/auth/login', {
+      localStorage.setItem('jwt', result.token);
 
-        method: 'POST',
+      setIsLoggedIn(true);
 
-        headers: {
+      const decoded = jwtDecode(result.token);
 
-          'Content-Type': 'application/json',
-
-        },
-
-        body: JSON.stringify(data),
-
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-
-        localStorage.setItem('jwt', result.token);
-
-        setIsLoggedIn(true);
-
-        const decoded = jwtDecode(result.token);
-
-        setUserName(decoded.first_name);
-        setDecodedToken(decoded);
-
-      }
+      setUserName(decoded.first_name);
+      setDecodedToken(decoded);
 
     } catch (error) {
-
       console.error('Error:', error);
-
     }
-
   };
 
   const handleRegister = async (data) => {
-
     try {
-
-      const response = await fetch('http://localhost:3000/users', {
-
-        method: 'POST',
-
-        headers: {
-
-          'Content-Type': 'application/json',
-
-        },
-
-        body: JSON.stringify(data)
-
-      });
-
-      if (response.ok) {
-
-        console.log('Usuario registrado');
-
-      }
-
+      await registerUser(data);
+      console.log('Usuario registrado');
     } catch (error) {
-
       console.error('Error:', error);
-
     }
-
   };
 
   const updatePassword = async (newPassword) => {
 
-  const token = localStorage.getItem('jwt');
-  const decoded = jwtDecode(token);
+    const token = localStorage.getItem('jwt');
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
 
-  const userId = decoded.id;
-
-  console.log(userId)
-
-  try {
-
-    const response = await fetch('http://localhost:3000/users/password', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        userId: userId,
+    try {
+      await updateUserPassword({
+        userId,
         password: newPassword
-      })
-    });
-
-    const data = await response.json();
-
-
-  } catch (error) {
-    console.error(error);
-  }
-};
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleLogoutClick = () => {
 

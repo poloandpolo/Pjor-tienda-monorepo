@@ -8,25 +8,25 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-// 🔥 LOG GLOBAL (CRÍTICO)
-app.use((req, res, next) => {
-  console.log('➡️', req.method, req.url);
-  next();
-});
+// 🔥 LISTA EXACTA DE ORÍGENES
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://pjor-tienda-monorepo.vercel.app',
+  'https://pjor-tienda-monorepo-iynypokk8-agustin-condados-projects.vercel.app'
+];
 
-// 🔥 HEALTH CHECK (CRÍTICO)
-app.get('/', (req, res) => {
-  res.send('Backend vivo');
-});
-
-// 🔥 CORS ULTRA SIMPLE (SIN CONDICIONES)
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
-    console.log('⚡ OPTIONS interceptado');
     return res.sendStatus(200);
   }
 
@@ -34,6 +34,11 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+// DEBUG
+app.get('/', (req, res) => {
+  res.send('Backend vivo');
+});
 
 // Rutas
 app.use('/users', userRoutes);
@@ -45,6 +50,4 @@ app.use('/api/orders', orderRoutes);
 // Puerto
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`🔥 Servidor corriendo en puerto ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));

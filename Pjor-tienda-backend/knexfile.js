@@ -14,17 +14,17 @@ module.exports = {
 
   production: {
     client: 'pg',
-    connection: {
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-      family: 4, // 🔥 fuerza IPv4 (clave para Render)
+    connection: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
     },
     pool: {
       min: 0,
       max: 5,
       acquireTimeoutMillis: 30000,
+      createTimeoutMillis: 30000,
+      idleTimeoutMillis: 30000,
+      reapIntervalMillis: 1000,
     },
   },
 };

@@ -3,7 +3,14 @@ const knexConfig = require('../knexfile');
 
 const env = process.env.NODE_ENV || 'development';
 
-const db = knex(knexConfig[env]);
+const db = knex({
+  ...knexConfig[env],
+  pool: {
+    min: 0,
+    max: 5,
+    acquireTimeoutMillis: 30000,
+  },
+});
 
 console.log('ENV:', process.env.NODE_ENV);
 

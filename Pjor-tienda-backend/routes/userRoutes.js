@@ -2,21 +2,19 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 
+// 🔥 MANEJO EXPLÍCITO DE PREFLIGHT
+router.options('/', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  return res.sendStatus(200);
+});
 
-// Ruta para crear un nuevo usuario
-// Método HTTP: POST
-// Endpoint final: /users
-// Esta ruta llama a la función createUser del controlador
+// POST /users
 router.post('/', userController.createUser);
 
-
-// Ruta para actualizar la contraseña del usuario
-// Método HTTP: PUT (se usa para actualizar recursos existentes)
-// Endpoint final: /users/password
-// Esta ruta ejecuta la función updatePassword del controlador
+// PUT /users/password
 router.put('/password', userController.updatePassword);
 
-
-// Exportamos el router para poder usarlo en el archivo principal del servidor
-// (normalmente server.js o app.js)
 module.exports = router;

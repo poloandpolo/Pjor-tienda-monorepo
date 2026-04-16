@@ -8,37 +8,32 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-// 🔥 CORS MANUAL GLOBAL
+// 🔥 LOG GLOBAL (CRÍTICO)
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
+  console.log('➡️', req.method, req.url);
+  next();
+});
 
-  if (
-    origin?.includes('vercel.app') ||
-    origin === 'http://localhost:5173'
-  ) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+// 🔥 HEALTH CHECK (CRÍTICO)
+app.get('/', (req, res) => {
+  res.send('Backend vivo');
+});
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+// 🔥 CORS ULTRA SIMPLE (SIN CONDICIONES)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // 🔥 CLAVE: responder OPTIONS global
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    console.log('⚡ OPTIONS interceptado');
+    return res.sendStatus(200);
   }
 
   next();
 });
 
 app.use(express.json());
-
-// 🔥 FORZAR OPTIONS EN CADA BASE ROUTE
-app.options('/users', (req, res) => res.sendStatus(200));
-app.options('/auth', (req, res) => res.sendStatus(200));
-app.options('/api', (req, res) => res.sendStatus(200));
-app.options('/api/payments', (req, res) => res.sendStatus(200));
-app.options('/api/orders', (req, res) => res.sendStatus(200));
 
 // Rutas
 app.use('/users', userRoutes);
@@ -50,4 +45,6 @@ app.use('/api/orders', orderRoutes);
 // Puerto
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🔥 Servidor corriendo en puerto ${PORT}`);
+});

@@ -119,13 +119,30 @@ export const AccountModal = ({ isVisible, onClose }) => {
   };
 
   const handleRegister = async (data) => {
-    try {
-      await registerUser(data);
-      console.log('Usuario registrado');
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+  try {
+    await registerUser(data);
+
+    // 🔥 auto-login después de registro
+    const loginResult = await loginUser({
+      email: data.email,
+      password: data.password
+    });
+
+    localStorage.setItem('jwt', loginResult.token);
+
+    const decoded = jwtDecode(loginResult.token);
+
+    setDecodedToken(decoded);
+    setUserName(decoded.first_name);
+    setIsLoggedIn(true);
+    setIsSignUp(false);
+
+    console.log('Usuario registrado y logueado');
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
 
   const updatePassword = async (newPassword) => {
 

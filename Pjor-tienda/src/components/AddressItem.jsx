@@ -4,7 +4,7 @@ import './styles/AddressItem.scss';
 // Componente para representar una dirección individual
 export const AddressItem = ({ address, isSelected, onSelect }) => {
   return (
-    <li className='address-item__content'>
+    <div className='address-item__content'>
       <label>
         <input
           type='radio'
@@ -20,6 +20,6 @@ export const AddressItem = ({ address, isSelected, onSelect }) => {
           Tel: {address.phone}
         </span>
       </label>
-    </li>
+    </div>
   );
 };

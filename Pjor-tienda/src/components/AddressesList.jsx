@@ -75,6 +75,14 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
       ) : (
         <div className="addresses-list__empty">
           <p>No hay direcciones disponibles</p>
+
+        <label
+        className="addresses-list__label"
+        onClick={openModal}
+      >
+        Agregar Dirección
+      </label>
+
         </div>
       )}
 

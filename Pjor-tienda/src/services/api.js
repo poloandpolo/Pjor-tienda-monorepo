@@ -3,6 +3,8 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem('jwt');
 
+  console.log('🔑 TOKEN EN apiFetch:', token); // 👈 AQUÍ
+
   if (!token) {
     console.error('❌ TOKEN MISSING');
   }

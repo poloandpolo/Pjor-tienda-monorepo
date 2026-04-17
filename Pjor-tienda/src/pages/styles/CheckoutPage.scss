@@ -39,6 +39,23 @@
     }
 }
 
+.checkout-page__add-payment {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    label {
+        font-family: Permanent Marker;
+        font-size: 25px;
+        color: brown;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
 .checkout-page__details-buttons-wrapper {
     display: flex;
     justify-content: center;
@@ -46,42 +63,42 @@
     font-family: Permanent Marker;
     font-size: 22px;
 
-    .checkout-page__shipping-button{
+    .checkout-page__shipping-button {
         margin-right: 8px;
         height: 120%;
         width: 10%;
         text-align: center;
-        justify-content: center ;
+        justify-content: center;
         align-items: center;
         padding: 1px;
         transform: translateY(10px);
     }
 
-    .checkout-page__payment-button{
+    .checkout-page__payment-button {
         height: 120%;
         width: 10%;
         text-align: center;
-        justify-content: center ;
+        justify-content: center;
         align-items: center;
         padding: 1px;
         transform: translateY(10px);
 
     }
 
-    .checkout-page__confirmation-button{
+    .checkout-page__confirmation-button {
         height: 18%;
         width: 20%;
         right: 0;
         position: absolute;
         text-align: center;
-        justify-content: center ;
+        justify-content: center;
         align-items: center;
         padding: 1px;
         transform: translateY(10px) translateX(-20px);
         color: brown;
 
     }
-    
+
 }
 
 

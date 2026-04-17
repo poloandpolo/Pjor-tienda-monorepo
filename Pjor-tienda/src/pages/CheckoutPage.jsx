@@ -95,19 +95,34 @@ const CheckoutPage = () => {
             </button>
           </div>
 
-          {/* Renderizado condicional */}
           {activeSection === 'shipping' && (
-            <AddressesList
-              ref={addressesListRef}
-              openModal={openModal}
-            />
+            <>
+              <AddressesList
+                ref={addressesListRef}
+                openModal={openModal}
+              />
+
+              <div className="checkout-page__add-address">
+                <label onClick={openModal}>
+                  Agregar Dirección
+                </label>
+              </div>
+            </>
           )}
 
           {activeSection === 'payment' && (
-            <PaymentsList
-              ref={paymentsListRef}          
-              openModal={openPaymentModal} 
-            />
+            <>
+              <PaymentsList
+                ref={paymentsListRef}
+                openModal={openPaymentModal}
+              />
+
+              <div className="checkout-page__add-payment">
+                <label onClick={openPaymentModal}>
+                  Agregar método de pago
+                </label>
+              </div>
+            </>
           )}
 
         </div>

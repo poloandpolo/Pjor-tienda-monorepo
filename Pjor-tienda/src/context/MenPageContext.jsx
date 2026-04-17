@@ -6,17 +6,20 @@ import playera_logo_clasica_mujer_2 from '../images/playera_logo_clasica_mujer.j
 import black from '../images/Clothing_Colors/Black.jpg';
 import white from '../images/Clothing_Colors/white.jpg';
 
-// Crear el contexto
+// 🔥 IMPORTANTE
+import { apiFetch } from '../services/api';
+
 const MenPageContext = createContext();
 
-// Hook para utilizar el contexto
 export const useMenPageContext = () => {
   return useContext(MenPageContext);
 };
 
-// Proveedor del contexto
 export const MenPageContextProvider = ({ children }) => {
-  // Estados relacionados con el carrito
+
+  // ========================
+  // 🛒 CART
+  // ========================
   const [cartItems, setCartItems] = useState(() => {
     const storedCart = localStorage.getItem('cartItems');
     return storedCart ? JSON.parse(storedCart) : [];
@@ -26,24 +29,13 @@ export const MenPageContextProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Artículos de ropa
-  const menClothingItems = [
-    { id: 1, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
-    { id: 2, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre 2", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
-    { id: 3, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre 3", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
-    { id: 4, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre 4", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
-  ];
-
-  const womenClothingItems = [
-    { id: 7, images: [playera_logo_clasica_mujer, playera_logo_clasica_mujer_2], text: "Playera logo clásica mujer", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
-    { id: 8, images: [playera_logo_clasica_mujer, playera_logo_clasica_mujer_2], text: "Playera logo clásica mujer 2", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
-  ];
-
   const addToCart = (item) => {
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (cartItem) =>
-          cartItem.id === item.id && cartItem.size === item.size && cartItem.color === item.color
+          cartItem.id === item.id &&
+          cartItem.size === item.size &&
+          cartItem.color === item.color
       );
 
       if (existingItemIndex > -1) {
@@ -68,24 +60,31 @@ export const MenPageContextProvider = ({ children }) => {
     );
   };
 
-  // Estado y lógica para las direcciones
+  // ========================
+  // 👕 PRODUCTS
+  // ========================
+  const menClothingItems = [
+    { id: 1, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
+    { id: 2, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre 2", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
+    { id: 3, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre 3", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
+    { id: 4, images: [playera_logo_clasica_hombre, playera_logo_clasica_hombre_2], text: "Playera logo clásica hombre 4", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
+  ];
+
+  const womenClothingItems = [
+    { id: 7, images: [playera_logo_clasica_mujer, playera_logo_clasica_mujer_2], text: "Playera logo clásica mujer", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
+    { id: 8, images: [playera_logo_clasica_mujer, playera_logo_clasica_mujer_2], text: "Playera logo clásica mujer 2", sizes: ['s', 'm', 'l', 'xl', 'xxl'], colors: [black, white], price: 100 },
+  ];
+
+  // ========================
+  // 📍 ADDRESSES
+  // ========================
   const [addresses, setAddresses] = useState([]);
   const [error, setError] = useState(null);
-  const [paymentMethods, setPaymentMethods] = useState([]);
 
   const fetchAddresses = async () => {
-    const token = localStorage.getItem('jwt');
-
     try {
-      const response = await fetch('http://localhost:3000/api/addresses', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const data = await apiFetch('/api/addresses');
 
-      const data = await response.json();
       if (data && Array.isArray(data.addresses)) {
         setAddresses(data.addresses);
         return data.addresses;
@@ -96,30 +95,22 @@ export const MenPageContextProvider = ({ children }) => {
         setAddresses([]);
         return [];
       }
+
     } catch (err) {
       setError('Error al cargar las direcciones');
       console.error(err);
-      throw new Error('Error al cargar las direcciones');
+      throw err;
     }
   };
 
-  useEffect(() => {
-    fetchAddresses().catch((err) => console.error(err));
-  }, []);
+  // ========================
+  // 💳 PAYMENTS
+  // ========================
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   const fetchPaymentMethods = async () => {
-    const token = localStorage.getItem('jwt');
-
     try {
-      const response = await fetch('http://localhost:3000/api/payments/payment-methods', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
+      const data = await apiFetch('/api/payments/payment-methods');
 
       if (Array.isArray(data)) {
         setPaymentMethods(data);
@@ -132,15 +123,13 @@ export const MenPageContextProvider = ({ children }) => {
     } catch (err) {
       setError('Error al cargar métodos de pago');
       console.error(err);
-      throw new Error('Error al cargar métodos de pago');
+      throw err;
     }
   };
 
-  useEffect(() => {
-    fetchPaymentMethods().catch((err) => console.error(err));
-  }, []);
-
-
+  // ========================
+  // PROVIDER
+  // ========================
   return (
     <MenPageContext.Provider
       value={{
@@ -153,7 +142,7 @@ export const MenPageContextProvider = ({ children }) => {
         error,
         fetchAddresses,
         paymentMethods,
-        fetchPaymentMethods, 
+        fetchPaymentMethods,
       }}
     >
       {children}

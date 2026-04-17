@@ -3,6 +3,11 @@ import './styles/AddressItem.scss';
 
 // Componente para representar una dirección individual
 export const AddressItem = ({ address, isSelected, onSelect }) => {
+
+  useEffect(() => {
+  console.log('📦 ADDRESSES STATE:', addresses);
+}, [addresses]);
+
   return (
     <div className='address-item__content'>
       <label>

@@ -21,11 +21,10 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
 
   const sliderRef = useRef(null);
 
-  // 🔥 DEBUG: ver estado global
+  // 🔥 DEBUG
   useEffect(() => {
     console.log('📦 ADDRESSES STATE:', addresses);
     console.log('📊 LENGTH:', addresses.length);
-    console.log('⚠️ TYPE:', typeof addresses);
   }, [addresses]);
 
   // 🔥 scroll control
@@ -43,7 +42,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     fetchAddresses();
   }, []);
 
-  // 🔥 re-render slider
+  // 🔥 forzar re-render de slick
   useEffect(() => {
     console.log('🔁 REBUILD SLIDER');
     setSliderKey(prev => prev + 1);
@@ -63,22 +62,22 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     setSelectedAddress(address);
   };
 
-  // 🔥 ERROR
+  // 🔥 ERROR STATE
   if (error) {
-    console.log('❌ ERROR STATE:', error);
-
     return (
       <div className="addresses-list__content">
         <div className="addresses-list__empty">
           Error al cargar direcciones: {error}
         </div>
 
-        <label
-          className="addresses-list__label"
-          onClick={openModal}
-        >
-          Agregar Dirección
-        </label>
+        <div className="addresses-list__footer">
+          <label
+            className="addresses-list__label"
+            onClick={openModal}
+          >
+            Agregar Dirección
+          </label>
+        </div>
       </div>
     );
   }
@@ -86,6 +85,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
   return (
     <div className="addresses-list__content">
 
+      {/* 🔥 BODY */}
       <div className="addresses-list__body">
         {addresses.length > 0 ? (
           <Slider
@@ -115,12 +115,15 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
         )}
       </div>
 
-      <label
-        className="addresses-list__label"
-        onClick={openModal}
-      >
-        Agregar Dirección
-      </label>
+      {/* 🔥 FOOTER (AQUÍ VA EL BOTÓN, FUERA DEL SLIDER) */}
+      <div className="addresses-list__footer">
+        <label
+          className="addresses-list__label"
+          onClick={openModal}
+        >
+          Agregar Dirección
+        </label>
+      </div>
 
     </div>
   );

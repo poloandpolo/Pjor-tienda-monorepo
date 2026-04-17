@@ -106,14 +106,14 @@
 
 /* 🔥 LABEL */
 .addresses-list__label {
-  margin: auto;
+  
   font-family: Permanent Marker;
   font-size: 25px;
   color: brown;
 
-  position: absolute;
-  bottom: 0;
-  transform: translateY(4vw);
+  position: static;   // 🔥 antes: absolute
+  transform: none;    // 🔥 eliminas hack
+  margin-top: 20px;   // 🔥 separación real
 
   &:hover {
     text-decoration: underline;

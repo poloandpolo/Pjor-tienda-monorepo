@@ -1,27 +1,29 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
 import Slider from 'react-slick';
-import './styles/PaymentsList.scss';
-import { PaymentItem } from './PaymentItem';
+import './styles/AddressesList.scss';
+import { AddressItem } from './AddressItem';
 import { useMenPageContext } from '../context/MenPageContext';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-export const PaymentsList = forwardRef(({ openModal }, ref) => {
+export const AddressesList = forwardRef(({ openModal }, ref) => {
 
-  const { payments = [], error, fetchPayments } = useMenPageContext();
-  const [selectedPayment, setSelectedPayment] = useState(null);
+  const { addresses = [], error, fetchAddresses } = useMenPageContext();
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const sliderRef = useRef(null);
 
+  // 🔥 Exponer función al padre
   useImperativeHandle(ref, () => ({
     scrollToLast: () => {
-      if (sliderRef.current && payments.length > 0) {
-        sliderRef.current.slickGoTo(payments.length - 1);
+      if (sliderRef.current && addresses.length > 0) {
+        sliderRef.current.slickGoTo(addresses.length - 1);
       }
     },
   }));
 
+  // 🔥 Fetch inicial
   useEffect(() => {
-    fetchPayments();
+    fetchAddresses();
   }, []);
 
   const sliderSettings = {
@@ -31,62 +33,73 @@ export const PaymentsList = forwardRef(({ openModal }, ref) => {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: false,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+    ],
   };
 
-  const handleSelection = (payment) => {
-    setSelectedPayment(payment);
+  const handleSelection = (address) => {
+    setSelectedAddress(address);
   };
 
   if (error) {
     return (
-      <div className="payments-list__content">
-        <div className="payments-list__empty">
-          Error al cargar métodos de pago: {error}
+      <div className="addresses-list__content">
+        <div className="addresses-list__empty">
+          Error al cargar direcciones: {error}
+
         </div>
 
-        <label
-          className="payments-list__label"
-          onClick={openModal}
-        >
-          Agregar Método de Pago
-        </label>
+         <label
+            className="addresses-list__label"
+            onClick={openModal}
+          >
+            Agregar Dirección
+          </label>
+          
       </div>
     );
   }
 
   return (
-    <div className="payments-list__content">
+    <div className="addresses-list__content">
 
-      {payments.length > 0 ? (
+      {addresses.length > 0 ? (
         <Slider ref={sliderRef} {...sliderSettings}>
-          {payments.map((payment) => (
-            <div key={payment.id}>
-              <PaymentItem
-                payment={payment}
-                isSelected={selectedPayment?.id === payment.id}
+          {addresses.map((address) => (
+            <div key={address.id}>
+              <AddressItem
+                address={address}
+                isSelected={selectedAddress?.id === address.id}
                 onSelect={handleSelection}
               />
             </div>
           ))}
         </Slider>
       ) : (
-        <div className="payments-list__empty">
-          <p>No hay métodos de pago</p>
+        <div className="addresses-list__empty">
+          <p>No hay direcciones disponibles</p>
 
           <label
-            className="payments-list__label"
+            className="addresses-list__label"
             onClick={openModal}
           >
-            Agregar Método de Pago
+            Agregar Dirección
           </label>
+
         </div>
       )}
 
       <label
-        className="payments-list__label"
+        className="addresses-list__label"
         onClick={openModal}
       >
-        Agregar Método de Pago
+        Agregar Dirección
       </label>
 
     </div>

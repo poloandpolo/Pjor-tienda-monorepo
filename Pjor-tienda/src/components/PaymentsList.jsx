@@ -10,21 +10,19 @@ import { PaymentItem } from './PaymentItem';
 
 export const PaymentsList = forwardRef(({ openModal }, ref) => {
 
-  const { paymentMethods, error, fetchPaymentMethods } = useMenPageContext();
+  const { paymentMethods = [], error, fetchPaymentMethods } = useMenPageContext();
 
   const [selectedPayment, setSelectedPayment] = useState(null);
   const sliderRef = React.useRef();
 
-  // 🔥 scroll igual que addresses
   useImperativeHandle(ref, () => ({
     scrollToLast: () => {
-      if (sliderRef.current) {
+      if (sliderRef.current && paymentMethods.length > 0) {
         sliderRef.current.slickGoTo(paymentMethods.length - 1);
       }
     },
   }));
 
-  // 🔥 fetch al montar (CLAVE)
   useEffect(() => {
     fetchPaymentMethods();
   }, []);
@@ -35,14 +33,6 @@ export const PaymentsList = forwardRef(({ openModal }, ref) => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1,
-        },
-      },
-    ],
   };
 
   const handleSelection = (payment) => {
@@ -50,30 +40,46 @@ export const PaymentsList = forwardRef(({ openModal }, ref) => {
   };
 
   if (error) {
-    return <div>Error al cargar métodos de pago: {error}</div>;
+    return (
+      <div className="payments-list__content">
+        <div className="payments-list__empty">
+          Error al cargar métodos de pago: {error}
+        </div>
+
+        <label className="payments-list__label" onClick={openModal}>
+          Agregar método de pago
+        </label>
+      </div>
+    );
   }
 
   return (
     <div className="payments-list__content">
-      {paymentMethods.length > 0 ? (
-        <Slider ref={sliderRef} {...sliderSettings}>
-          {paymentMethods.map((payment) => (
-            <div key={payment.id}>
-              <PaymentItem
-                payment={payment}
-                isSelected={selectedPayment && selectedPayment.id === payment.id}
-                onSelect={handleSelection}
-              />
-            </div>
-          ))}
-        </Slider>
-      ) : (
-        <div>No hay métodos de pago disponibles</div>
-      )}
+
+      <div className="payments-list__body">
+        {paymentMethods.length > 0 ? (
+          <Slider ref={sliderRef} {...sliderSettings}>
+            {paymentMethods.map((payment) => (
+              <div key={payment.id}>
+                <PaymentItem
+                  payment={payment}
+                  isSelected={selectedPayment?.id === payment.id}
+                  onSelect={handleSelection}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <div className="payments-list__empty">
+            No hay métodos de pago disponibles
+          </div>
+        )}
+      </div>
 
       <label className="payments-list__label" onClick={openModal}>
         Agregar método de pago
       </label>
+
     </div>
   );
 });

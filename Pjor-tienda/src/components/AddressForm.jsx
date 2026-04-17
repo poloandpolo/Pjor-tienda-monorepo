@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import './styles/AddressForm.scss';
 import { useMenPageContext } from '../context/MenPageContext';
+import { createAddress } from '../services/addressService'; // ✅ NUEVO
 
 export const AddressForm = ({ onSubmit, modalOpen, closeModal }) => {
   const {
@@ -16,28 +17,16 @@ export const AddressForm = ({ onSubmit, modalOpen, closeModal }) => {
     try {
       console.log(localStorage.getItem('jwt'));
 
-      const response = await fetch('http://localhost:3000/api/addresses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('jwt')}`, // Asumiendo que el token se almacena en localStorage
-        },
-        body: JSON.stringify({
-          first_name: data.firstName,
-          last_name: data.lastName,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          postal_code: data.zipCode,
-          phone: data.phone,
-        }),
+      // ✅ USAR SERVICE EN LUGAR DE FETCH
+      const result = await createAddress({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        postal_code: data.zipCode,
+        phone: data.phone,
       });
-
-      if (!response.ok) {
-        throw new Error('Error al guardar la dirección');
-      }
-
-      const result = await response.json();
 
       // Llamamos a fetchAddresses para obtener las nuevas direcciones
       await fetchAddresses();
@@ -45,13 +34,13 @@ export const AddressForm = ({ onSubmit, modalOpen, closeModal }) => {
       // Llamamos a onSubmit con el resultado después de actualizar las direcciones
       onSubmit(result);
       closeModal();
+
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
   };
 
   const handleOverlayClick = (e) => {
-    // Cerrar modal cuando se hace clic en el overlay (fondo)
     if (e.target === e.currentTarget) {
       closeModal();
       console.log(modalOpen)
@@ -59,7 +48,6 @@ export const AddressForm = ({ onSubmit, modalOpen, closeModal }) => {
   };
 
   const handleCloseClick = () => {
-    // Cerrar modal cuando se hace clic en la X
     closeModal();
     console.log(modalOpen)
   };
@@ -67,14 +55,14 @@ export const AddressForm = ({ onSubmit, modalOpen, closeModal }) => {
   return (
     <div
       className={`address-form__overlay${modalOpen ? ' --show' : ''}`}
-      onClick={handleOverlayClick} // Al hacer clic en el overlay, se cierra el modal
+      onClick={handleOverlayClick}
     >
       <form className="address-form" onSubmit={handleSubmit(onFormSubmit)} onClick={(e) => e.stopPropagation()} >
         <div className="address-form__close-wrapper">
           <button
             type="button"
             className="address-form__close-button"
-            onClick={handleCloseClick} // Cerrar modal al hacer clic en la X
+            onClick={handleCloseClick}
           >
             X
           </button>

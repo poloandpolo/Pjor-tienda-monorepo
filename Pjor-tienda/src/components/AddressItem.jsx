@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './styles/AddressItem.scss';
-import React, { useEffect } from 'react';
 
 // Componente para representar una dirección individual
 export const AddressItem = ({ address, isSelected, onSelect }) => {

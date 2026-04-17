@@ -3,16 +3,20 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem('jwt');
 
+  console.log('🔑 TOKEN EN apiFetch:', token);
+
+  // 👇 AQUÍ VA
   if (!token) {
-    throw new Error('No authenticated user');
+    console.warn('No token, request not sent');
+    return null; // o throw new Error('No authenticated user');
   }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    ...options,
   });
 
   if (!response.ok) {

@@ -1,4 +1,4 @@
-.payments-list__content {
+.addresses-list__content {
   background-color: rgba(0, 0, 0, 0.089);
   min-height: 60vh;
   display: flex;
@@ -10,7 +10,8 @@
   position: relative;
   flex-direction: column;
 
-  .payments-list__empty {
+
+  .addresses-list__empty {
     flex: 1;
     display: flex;
     align-items: center;
@@ -23,7 +24,11 @@
       align-items: center;
       justify-content: center;
     }
+
+
   }
+
+
 
   .slick-list {
     height: 100%;
@@ -40,18 +45,75 @@
     width: 100%;
     height: 100%;
     position: relative;
+
+    .slick-list {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .slick-track {
+      display: flex;
+      align-items: center;
+    }
+
+    .slick-slide {
+      padding: 10px; // Espaciado entre diapositivas
+      transition: transform 0.3s ease;
+    }
+
+    .slick-prev,
+    .slick-next {
+      width: 30px;
+      height: 30px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+
+      &:hover {
+        background-color: black;
+      }
+    }
+
+    .slick-dots {
+      bottom: -20px;
+
+      li {
+        margin: 0 5px;
+
+        button {
+          width: 10px;
+          height: 10px;
+          background-color: gray;
+          border-radius: 50%;
+          transition: background-color 0.3s;
+
+          &:hover {
+            background-color: black;
+          }
+        }
+      }
+
+      .slick-active button {
+        background-color: black;
+      }
+    }
   }
 }
 
-.payments-list__label {
+.addresses-list__label {
   margin: auto;
   font-family: Permanent Marker;
   font-size: 25px;
   color: brown;
   position: static;
+  bottom: 0;
   transform: translateY(7vw);
   margin-top: auto;
-  cursor: pointer;
 
   &:hover {
     text-decoration: underline;

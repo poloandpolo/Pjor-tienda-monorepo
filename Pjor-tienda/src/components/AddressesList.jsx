@@ -1,4 +1,10 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import Slider from 'react-slick';
 import './styles/AddressesList.scss';
 import { AddressItem } from './AddressItem';
@@ -9,10 +15,13 @@ import 'slick-carousel/slick/slick-theme.css';
 export const AddressesList = forwardRef(({ openModal }, ref) => {
 
   const { addresses = [], error, fetchAddresses } = useMenPageContext();
+
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [sliderKey, setSliderKey] = useState(0);
+
   const sliderRef = useRef(null);
 
-  // 🔥 scroll control
+  // 🔥 scroll control (padre)
   useImperativeHandle(ref, () => ({
     scrollToLast: () => {
       if (sliderRef.current && addresses.length > 0) {
@@ -21,10 +30,15 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     },
   }));
 
-  // 🔥 fetch inicial
+  // 🔥 fetch al entrar a la página
   useEffect(() => {
     fetchAddresses();
   }, []);
+
+  // 🔥 fuerza re-render del slider cuando cambian las direcciones
+  useEffect(() => {
+    setSliderKey(prev => prev + 1);
+  }, [addresses]);
 
   const sliderSettings = {
     dots: false,
@@ -62,7 +76,11 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
 
       <div className="addresses-list__body">
         {addresses.length > 0 ? (
-          <Slider ref={sliderRef} {...sliderSettings}>
+          <Slider
+            key={sliderKey} // 🔥 CLAVE para re-render correcto
+            ref={sliderRef}
+            {...sliderSettings}
+          >
             {addresses.map((address) => (
               <div key={address.id}>
                 <AddressItem

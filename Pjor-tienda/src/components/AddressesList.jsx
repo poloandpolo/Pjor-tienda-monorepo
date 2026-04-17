@@ -12,7 +12,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const sliderRef = useRef(null);
 
-  // 🔥 Exponer función al padre
+  // 🔥 scroll control
   useImperativeHandle(ref, () => ({
     scrollToLast: () => {
       if (sliderRef.current && addresses.length > 0) {
@@ -21,7 +21,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     },
   }));
 
-  // 🔥 Fetch inicial
+  // 🔥 fetch inicial
   useEffect(() => {
     fetchAddresses();
   }, []);
@@ -33,35 +33,26 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: false,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1,
-        },
-      },
-    ],
   };
 
   const handleSelection = (address) => {
     setSelectedAddress(address);
   };
 
+  // 🔥 ERROR STATE
   if (error) {
     return (
       <div className="addresses-list__content">
         <div className="addresses-list__empty">
           Error al cargar direcciones: {error}
-
         </div>
 
-         <label
-            className="addresses-list__label"
-            onClick={openModal}
-          >
-            Agregar Dirección
-          </label>
-          
+        <label
+          className="addresses-list__label"
+          onClick={openModal}
+        >
+          Agregar Dirección
+        </label>
       </div>
     );
   }
@@ -69,31 +60,25 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
   return (
     <div className="addresses-list__content">
 
-      {addresses.length > 0 ? (
-        <Slider ref={sliderRef} {...sliderSettings}>
-          {addresses.map((address) => (
-            <div key={address.id}>
-              <AddressItem
-                address={address}
-                isSelected={selectedAddress?.id === address.id}
-                onSelect={handleSelection}
-              />
-            </div>
-          ))}
-        </Slider>
-      ) : (
-        <div className="addresses-list__empty">
-          <p>No hay direcciones disponibles</p>
-
-          <label
-            className="addresses-list__label"
-            onClick={openModal}
-          >
-            Agregar Dirección
-          </label>
-
-        </div>
-      )}
+      <div className="addresses-list__body">
+        {addresses.length > 0 ? (
+          <Slider ref={sliderRef} {...sliderSettings}>
+            {addresses.map((address) => (
+              <div key={address.id}>
+                <AddressItem
+                  address={address}
+                  isSelected={selectedAddress?.id === address.id}
+                  onSelect={handleSelection}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <div className="addresses-list__empty">
+            No hay direcciones disponibles
+          </div>
+        )}
+      </div>
 
       <label
         className="addresses-list__label"

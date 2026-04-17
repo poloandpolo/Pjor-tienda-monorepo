@@ -55,7 +55,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false,
+    arrows: true,
   };
 
   const handleSelection = (address) => {

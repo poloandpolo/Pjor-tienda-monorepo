@@ -3,20 +3,23 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem('jwt');
 
+  if (!token) {
+    console.error('❌ TOKEN MISSING');
+  }
+
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      Authorization: `Bearer ${token}`, // 🔥 SIEMPRE ENVÍA
     },
     ...options,
   });
 
-  const data = await response.json().catch(() => null);
-
   if (!response.ok) {
-    console.error('API ERROR:', data);
-    throw new Error(data?.message || 'Error en la petición');
+    const errorData = await response.json().catch(() => ({}));
+    console.error('API ERROR:', errorData);
+    throw new Error(errorData.message || 'Error en la petición');
   }
 
-  return data;
+  return response.json();
 };

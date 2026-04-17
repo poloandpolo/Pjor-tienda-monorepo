@@ -1,22 +1,19 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const apiFetch = async (endpoint, options = {}) => {
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const token = localStorage.getItem('jwt');
+
+  const res = await fetch(`/api${endpoint}`, {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
-    },
-    ...options,
+      ...(token && { Authorization: `Bearer ${token}` })
+    }
   });
 
-  const data = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    throw {
-      status: response.status,
-      statusText: response.statusText,
-      data,
-    };
+  if (!res.ok) {
+    throw new Error('Error en la petición');
   }
 
-  return data;
+  return res.json();
 };

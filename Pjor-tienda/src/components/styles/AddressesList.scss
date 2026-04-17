@@ -1,90 +1,99 @@
 .addresses-list__content {
-    background-color: rgba(0, 0, 0, 0.089);
-    min-height: 60vh;
+  background-color: rgba(0, 0, 0, 0.089);
+  min-height: 60vh;
+  display: flex;
+  margin: 20px 0;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding: 10%;
+  position: relative;
+
+
+  .addresses-list__empty {
+    flex: 1;
     display: flex;
-    margin: 20px 0;
-    text-align: center;
     align-items: center;
     justify-content: center;
-    padding: 10%;
+    text-align: center;
+  }
+
+  .slick-list {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+  }
+
+  .slick-slider.slick-initialized {
+    width: 90%;
+    height: 90%;
+  }
+
+  .slick-slider {
+    width: 100%;
+    height: 100%;
     position: relative;
 
     .slick-list {
-        height: 100%;
-        width: 100%;
-        position: absolute;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
 
-    .slick-slider.slick-initialized{
-        width: 90%;
-        height: 90%;
+    .slick-track {
+      display: flex;
+      align-items: center;
     }
 
-    .slick-slider {
-  width: 100%;
-  height: 100%;
-  position: relative;
-
-  .slick-list {
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
-
-  .slick-track {
-    display: flex;
-    align-items: center;
-  }
-
-  .slick-slide {
-    padding: 10px; // Espaciado entre diapositivas
-    transition: transform 0.3s ease;
-  }
-
-  .slick-prev,
-  .slick-next {
-    width: 30px;
-    height: 30px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-
-    &:hover {
-      background-color: black;
+    .slick-slide {
+      padding: 10px; // Espaciado entre diapositivas
+      transition: transform 0.3s ease;
     }
-  }
 
-  .slick-dots {
-    bottom: -20px;
+    .slick-prev,
+    .slick-next {
+      width: 30px;
+      height: 30px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
 
-    li {
-      margin: 0 5px;
-
-      button {
-        width: 10px;
-        height: 10px;
-        background-color: gray;
-        border-radius: 50%;
-        transition: background-color 0.3s;
-
-        &:hover {
-          background-color: black;
-        }
+      &:hover {
+        background-color: black;
       }
     }
 
-    .slick-active button {
-      background-color: black;
+    .slick-dots {
+      bottom: -20px;
+
+      li {
+        margin: 0 5px;
+
+        button {
+          width: 10px;
+          height: 10px;
+          background-color: gray;
+          border-radius: 50%;
+          transition: background-color 0.3s;
+
+          &:hover {
+            background-color: black;
+          }
+        }
+      }
+
+      .slick-active button {
+        background-color: black;
+      }
     }
   }
-}   
 }
 
-.addresses-list__label{
+.addresses-list__label {
   margin: auto;
   font-family: Permanent Marker;
   font-size: 25px;
@@ -94,6 +103,6 @@
   transform: translateY(4vw);
 
   &:hover {
-      text-decoration: underline;
+    text-decoration: underline;
   }
 }

@@ -52,6 +52,14 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
       <div className="addresses-list__content">
         <div className="addresses-list__empty">
           Error al cargar direcciones: {error}
+
+          <label
+            className="addresses-list__label"
+            onClick={openModal}
+          >
+            Agregar Dirección
+          </label>
+
         </div>
       </div>
     );
@@ -76,12 +84,12 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
         <div className="addresses-list__empty">
           <p>No hay direcciones disponibles</p>
 
-        <label
-        className="addresses-list__label"
-        onClick={openModal}
-      >
-        Agregar Dirección
-      </label>
+          <label
+            className="addresses-list__label"
+            onClick={openModal}
+          >
+            Agregar Dirección
+          </label>
 
         </div>
       )}

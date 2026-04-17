@@ -8,6 +8,7 @@
   justify-content: center;
   padding: 10%;
   position: relative;
+  flex-direction: column;
 
 
   .addresses-list__empty {
@@ -16,7 +17,18 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+
+    .slick-slider {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
   }
+
+
 
   .slick-list {
     height: 100%;
@@ -98,9 +110,10 @@
   font-family: Permanent Marker;
   font-size: 25px;
   color: brown;
-  position: absolute;
+  position: static;
   bottom: 0;
-  transform: translateY(4vw);
+  transform: none;
+  margin-top: auto;
 
   &:hover {
     text-decoration: underline;

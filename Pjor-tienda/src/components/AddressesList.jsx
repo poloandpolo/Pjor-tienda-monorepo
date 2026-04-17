@@ -42,9 +42,8 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     fetchAddresses();
   }, []);
 
-  // 🔥 forzar re-render de slick
+  // 🔥 re-render slider
   useEffect(() => {
-    console.log('🔁 REBUILD SLIDER');
     setSliderKey(prev => prev + 1);
   }, [addresses]);
 
@@ -66,8 +65,11 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
   if (error) {
     return (
       <div className="addresses-list__content">
-        <div className="addresses-list__empty">
-          Error al cargar direcciones: {error}
+
+        <div className="addresses-list__body">
+          <div className="addresses-list__empty">
+            Error al cargar direcciones: {error}
+          </div>
         </div>
 
         <div className="addresses-list__footer">
@@ -78,6 +80,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
             Agregar Dirección
           </label>
         </div>
+
       </div>
     );
   }
@@ -115,7 +118,7 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
         )}
       </div>
 
-      {/* 🔥 FOOTER (AQUÍ VA EL BOTÓN, FUERA DEL SLIDER) */}
+      {/* 🔥 FOOTER */}
       <div className="addresses-list__footer">
         <label
           className="addresses-list__label"

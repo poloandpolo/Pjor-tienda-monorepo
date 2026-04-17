@@ -21,7 +21,14 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
 
   const sliderRef = useRef(null);
 
-  // 🔥 scroll control (padre)
+  // 🔥 DEBUG: ver estado global
+  useEffect(() => {
+    console.log('📦 ADDRESSES STATE:', addresses);
+    console.log('📊 LENGTH:', addresses.length);
+    console.log('⚠️ TYPE:', typeof addresses);
+  }, [addresses]);
+
+  // 🔥 scroll control
   useImperativeHandle(ref, () => ({
     scrollToLast: () => {
       if (sliderRef.current && addresses.length > 0) {
@@ -30,13 +37,15 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
     },
   }));
 
-  // 🔥 fetch al entrar a la página
+  // 🔥 fetch inicial
   useEffect(() => {
+    console.log('🚀 FETCHING ADDRESSES...');
     fetchAddresses();
   }, []);
 
-  // 🔥 fuerza re-render del slider cuando cambian las direcciones
+  // 🔥 re-render slider
   useEffect(() => {
+    console.log('🔁 REBUILD SLIDER');
     setSliderKey(prev => prev + 1);
   }, [addresses]);
 
@@ -50,11 +59,14 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
   };
 
   const handleSelection = (address) => {
+    console.log('✅ SELECTED ADDRESS:', address);
     setSelectedAddress(address);
   };
 
-  // 🔥 ERROR STATE
+  // 🔥 ERROR
   if (error) {
+    console.log('❌ ERROR STATE:', error);
+
     return (
       <div className="addresses-list__content">
         <div className="addresses-list__empty">
@@ -77,22 +89,27 @@ export const AddressesList = forwardRef(({ openModal }, ref) => {
       <div className="addresses-list__body">
         {addresses.length > 0 ? (
           <Slider
-            key={sliderKey} // 🔥 CLAVE para re-render correcto
+            key={sliderKey}
             ref={sliderRef}
             {...sliderSettings}
           >
-            {addresses.map((address) => (
-              <div key={address.id}>
-                <AddressItem
-                  address={address}
-                  isSelected={selectedAddress?.id === address.id}
-                  onSelect={handleSelection}
-                />
-              </div>
-            ))}
+            {addresses.map((address) => {
+              console.log('🧱 RENDERING ADDRESS:', address);
+
+              return (
+                <div key={address.id}>
+                  <AddressItem
+                    address={address}
+                    isSelected={selectedAddress?.id === address.id}
+                    onSelect={handleSelection}
+                  />
+                </div>
+              );
+            })}
           </Slider>
         ) : (
           <div className="addresses-list__empty">
+            {console.log('⚠️ NO ADDRESSES')}
             No hay direcciones disponibles
           </div>
         )}

@@ -38,6 +38,23 @@
     }
 }
 
+.checkout-page__add-address {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    label {
+        font-family: Permanent Marker;
+        font-size: 25px;
+        color: brown;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
 .checkout-page__add-payment {
     display: flex;
     justify-content: center;
@@ -107,4 +124,11 @@
     border-left: 3px solid rgba(0, 0, 0, 0.062);
     background-color: rgba(94, 94, 94, 0.089);
     overflow: scroll;
+}
+
+.checkout-page__add-payment{
+    label{
+        margin: auto;
+
+    }
 }

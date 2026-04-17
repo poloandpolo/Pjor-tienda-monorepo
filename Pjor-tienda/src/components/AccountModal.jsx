@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { jwtDecode } from 'jwt-decode';
 import './styles/AccountModal.scss';
 import { ProfileInfo } from './ProfileInfo';
 import { loginUser, registerUser, updateUserPassword } from '../services/authService';
 
+// 🔥 AUTH CONTEXT
+import { useAuth } from '../context/authContext';
+
 export const AccountModal = ({ isVisible, onClose }) => {
 
+  // ========================
+  // 🔐 AUTH CONTEXT
+  // ========================
+  const { user, isAuthenticated, login, logout } = useAuth();
+
+  // ========================
+  // UI STATES
+  // ========================
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-
-  const [decodedToken, setDecodedToken] = useState(null);
-  const [userName, setUserName] = useState(undefined);
 
   const [tempValues, setTempValues] = useState({});
 
@@ -26,37 +32,9 @@ export const AccountModal = ({ isVisible, onClose }) => {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  useEffect(() => {
-    const token = localStorage.getItem('jwt');
-
-    if (token) {
-      try {
-
-        const decoded = jwtDecode(token);
-        const currentTime = Math.floor(Date.now() / 1000);
-
-        if (decoded.exp > currentTime) {
-
-          setIsLoggedIn(true);
-          setUserName(decoded.first_name);
-          setDecodedToken(decoded);
-
-        } else {
-
-          localStorage.removeItem('jwt');
-          setIsLoggedIn(false);
-
-        }
-
-      } catch (error) {
-
-        localStorage.removeItem('jwt');
-
-      }
-    }
-
-  }, []);
-
+  // ========================
+  // UI HEIGHT CONTROL
+  // ========================
   useEffect(() => {
 
     const contentElement = document.querySelector('.account-modal__content');
@@ -64,95 +42,69 @@ export const AccountModal = ({ isVisible, onClose }) => {
     if (contentElement) {
 
       const getHeight = () => {
-
         if (isSignUp) return '80vh';
-        if (isLoggedIn) return '90vh';
+        if (isAuthenticated) return '90vh';
         if (showProfile) return '80vh';
-
         return '60vh';
-
       };
 
       contentElement.style.setProperty('--content-height', getHeight());
-
     }
 
-  }, [isSignUp, isLoggedIn, showProfile]);
+  }, [isSignUp, isAuthenticated, showProfile]);
 
-  const handleForgotPasswordClick = () => {
-
-    setIsForgotPassword(true);
-    setIsSignUp(false);
-
-  };
-
-  const handleBackToLoginClick = () => {
-
-    setIsForgotPassword(false);
-    setIsSignUp(false);
-
-  };
-
-  const handleSignUpClick = () => {
-
-    setIsSignUp(true);
-    setIsForgotPassword(false);
-
-  };
-
+  // ========================
+  // LOGIN
+  // ========================
   const handleLoginClick = async (data) => {
     try {
       const result = await loginUser(data);
 
-      localStorage.setItem('jwt', result.token);
+      if (!result?.token) throw new Error('Token missing');
 
-      setIsLoggedIn(true);
+      login(result.token); // 🔥 AUTH CONTEXT
 
-      const decoded = jwtDecode(result.token);
-
-      setUserName(decoded.first_name);
-      setDecodedToken(decoded);
+      setIsSignUp(false);
+      setIsForgotPassword(false);
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Login error:', error);
     }
   };
 
+  // ========================
+  // REGISTER + AUTO LOGIN
+  // ========================
   const handleRegister = async (data) => {
-  try {
-    await registerUser(data);
+    try {
+      await registerUser(data);
 
-    // 🔥 auto-login después de registro
-    const loginResult = await loginUser({
-      email: data.email,
-      password: data.password
-    });
+      const loginResult = await loginUser({
+        email: data.email,
+        password: data.password
+      });
 
-    localStorage.setItem('jwt', loginResult.token);
+      if (!loginResult?.token) throw new Error('Token missing');
 
-    const decoded = jwtDecode(loginResult.token);
+      login(loginResult.token); // 🔥 AUTH CONTEXT
 
-    setDecodedToken(decoded);
-    setUserName(decoded.first_name);
-    setIsLoggedIn(true);
-    setIsSignUp(false);
+      setIsSignUp(false);
+      setIsForgotPassword(false);
 
-    console.log('Usuario registrado y logueado');
+      console.log('Usuario registrado y logueado');
 
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+    } catch (error) {
+      console.error('Register error:', error);
+    }
+  };
 
+  // ========================
+  // PASSWORD UPDATE
+  // ========================
   const updatePassword = async (newPassword) => {
-
-    const token = localStorage.getItem('jwt');
-    const decoded = jwtDecode(token);
-    const userId = decoded.id;
-
     try {
       await updateUserPassword({
-        userId,
+        userId: user.id,
         password: newPassword
       });
     } catch (error) {
@@ -160,113 +112,103 @@ export const AccountModal = ({ isVisible, onClose }) => {
     }
   };
 
+  // ========================
+  // LOGOUT
+  // ========================
   const handleLogoutClick = () => {
+    logout(); // 🔥 AUTH CONTEXT
 
-    localStorage.removeItem('jwt');
+    setShowProfile(false);
+    setIsSignUp(false);
+    setIsForgotPassword(false);
+  };
 
-    setIsLoggedIn(false);
-    setUserName(undefined);
-    setDecodedToken(null);
+  // ========================
+  // UI HANDLERS
+  // ========================
+  const handleForgotPasswordClick = () => {
+    setIsForgotPassword(true);
+    setIsSignUp(false);
+  };
 
+  const handleBackToLoginClick = () => {
+    setIsForgotPassword(false);
+    setIsSignUp(false);
+  };
+
+  const handleSignUpClick = () => {
+    setIsSignUp(true);
+    setIsForgotPassword(false);
   };
 
   const handleViewProfileClick = () => {
-
     setShowProfile(true);
-
   };
 
   const handleBackToMenuClick = () => {
-
     setShowProfile(false);
-
   };
 
   const handleEditClick = (field) => {
-
     setEditingFields((prev) => ({
-
       ...prev,
       [field]: !prev[field],
-
     }));
-
   };
 
   const handleFieldChange = (field, value) => {
-
     setTempValues((prev) => ({
-
       ...prev,
       [field]: value
-
     }));
-
   };
 
   const handleSaveClick = (field) => {
-
     if (field === 'password') {
-
       updatePassword(tempValues.password);
-
     }
 
-    console.log(`Guardando cambios para ${field}:`, tempValues[field]);
-
     setEditingFields((prev) => ({
-
       ...prev,
       [field]: false
-
     }));
-
   };
 
   const handleCancelClick = (field) => {
-
-    console.log(`Cancelando cambios para ${field}`);
-
     setEditingFields((prev) => ({
-
       ...prev,
       [field]: false
-
     }));
-
   };
 
+  // ========================
+  // RENDER
+  // ========================
   return (
-
     <div className={`account-modal__overlay ${isVisible ? 'show' : ''}`}>
 
       <div className='account-modal__content'>
 
         <div className='account-modal__close-wrapper'>
-
-          <button
-            className='account-modal__close-button'
-            onClick={onClose}
-          >
+          <button className='account-modal__close-button' onClick={onClose}>
             X
           </button>
-
         </div>
 
-        {isLoggedIn ? (
+        {/* ========================
+            LOGGED IN
+        ======================== */}
+        {isAuthenticated ? (
 
           showProfile ? (
 
             <>
-
               <div className='account-modal__title'>
-
                 <h2>Tu perfil</h2>
-
               </div>
 
               <ProfileInfo
-                decodedToken={decodedToken}
+                decodedToken={user}
                 editingFields={editingFields}
                 handleFieldChange={handleFieldChange}
                 handleEditClick={handleEditClick}
@@ -274,21 +216,16 @@ export const AccountModal = ({ isVisible, onClose }) => {
                 handleCancelClick={handleCancelClick}
                 handleBackToMenuClick={handleBackToMenuClick}
               />
-
             </>
 
           ) : (
 
             <>
-
               <div className='account-modal__title'>
-
-                <h2>Bienvenido, {userName || 'Usuario'}</h2>
-
+                <h2>Bienvenido, {user?.first_name || 'Usuario'}</h2>
               </div>
 
               <div className='account-modal__menu'>
-
                 <h2 onClick={handleViewProfileClick}>Tu perfil</h2>
                 <h2>Tus pedidos</h2>
                 <h2>Promociones</h2>
@@ -300,9 +237,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
                 >
                   Cerrar sesión
                 </button>
-
               </div>
-
             </>
 
           )
@@ -337,52 +272,33 @@ export const AccountModal = ({ isVisible, onClose }) => {
 
               <input
                 placeholder='Nombre'
-                type='text'
-                {...register('firstName', { required: 'Este campo es obligatorio' })}
+                {...register('firstName', { required: true })}
               />
-
-              {errors.firstName && <p className='error'>{errors.firstName.message}</p>}
+              {errors.firstName && <p>Error</p>}
 
               <input
                 placeholder='Apellido'
-                type='text'
-                {...register('lastName', { required: 'Este campo es obligatorio' })}
+                {...register('lastName', { required: true })}
               />
-
-              {errors.lastName && <p className='error'>{errors.lastName.message}</p>}
 
               <input
                 placeholder='Email'
-                type='email'
-                {...register('email', {
-                  required: 'Este campo es obligatorio',
-                  pattern: {
-                    value: /^[^@]+@[^@]+\.[^@]+$/,
-                    message: 'Email no válido'
-                  },
-                })}
+                {...register('email', { required: true })}
               />
-
-              {errors.email && <p className='error'>{errors.email.message}</p>}
 
               <input
                 placeholder='Contraseña'
                 type='password'
-                {...register('password', { required: 'Este campo es obligatorio' })}
+                {...register('password', { required: true })}
               />
 
-              {errors.password && <p className='error'>{errors.password.message}</p>}
-
-              <button type="submit">
-                Registrar
-              </button>
+              <button type="submit">Registrar</button>
 
               <label onClick={handleBackToLoginClick}>
                 Volver a iniciar sesión
               </label>
 
             </form>
-
           </>
 
         ) : (
@@ -396,20 +312,16 @@ export const AccountModal = ({ isVisible, onClose }) => {
 
               <input
                 placeholder='Email'
-                type='email'
-                {...register('email', { required: 'Este campo es obligatorio' })}
+                {...register('email', { required: true })}
               />
 
               <input
                 placeholder='Contraseña'
                 type='password'
-                {...register('password', { required: 'Este campo es obligatorio' })}
+                {...register('password', { required: true })}
               />
 
-              <button
-                type="submit"
-                onClick={handleSubmit(handleLoginClick)}
-              >
+              <button onClick={handleSubmit(handleLoginClick)}>
                 Entrar
               </button>
 
@@ -429,7 +341,5 @@ export const AccountModal = ({ isVisible, onClose }) => {
       </div>
 
     </div>
-
   );
-
 };

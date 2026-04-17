@@ -14,7 +14,7 @@ import 'slick-carousel/slick/slick-theme.css';
 
 export const AddressesList = forwardRef((props, ref) => {
 
-  const { addresses = [], error, fetchAddresses } = useMenPageContext();
+  const { addresses = [], error, fetchAddresses, isAuthenticated } = useMenPageContext();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [sliderKey, setSliderKey] = useState(0);
@@ -32,9 +32,11 @@ export const AddressesList = forwardRef((props, ref) => {
 
   // fetch inicial
   useEffect(() => {
-    fetchAddresses();
-  }, []);
-
+    if (isAuthenticated) {
+      fetchAddresses();
+    }
+  }, [isAuthenticated]);
+  
   // re-render slider
   useEffect(() => {
     setSliderKey(prev => prev + 1);

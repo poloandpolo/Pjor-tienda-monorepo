@@ -10,6 +10,7 @@ import white from '../images/Clothing_Colors/white.jpg';
 import { apiFetch } from '../services/api';
 
 const MenPageContext = createContext();
+const isAuthenticated = !!localStorage.getItem('jwt');
 
 export const useMenPageContext = () => {
   return useContext(MenPageContext);
@@ -143,6 +144,7 @@ export const MenPageContextProvider = ({ children }) => {
         fetchAddresses,
         paymentMethods,
         fetchPaymentMethods,
+        isAuthenticated,
       }}
     >
       {children}

@@ -32,7 +32,7 @@
   height: 90%;
 }
 
-/* ❌ QUITAMOS position:absolute */
+/* 🔥 LIST */
 .slick-list {
   height: 100%;
   width: 100%;
@@ -41,7 +41,7 @@
   padding: 0;
 }
 
-/* 🔥 CLAVE para que los items se vean */
+/* 🔥 TRACK */
 .slick-track {
   display: flex !important;
   align-items: center;
@@ -102,20 +102,4 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* 🔥 LABEL */
-.addresses-list__label {
-  
-  font-family: Permanent Marker;
-  font-size: 25px;
-  color: brown;
-
-  position: static;   // 🔥 antes: absolute
-  transform: none;    // 🔥 eliminas hack
-  margin-top: 20px;   // 🔥 separación real
-
-  &:hover {
-    text-decoration: underline;
-  }
 }

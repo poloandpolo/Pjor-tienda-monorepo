@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './styles/PaymentModal.scss';
 import { loadStripe } from '@stripe/stripe-js';
-import { useMenPageContext } from '../context/MenPageContext'; // 🔥 AÑADIDO
+import { useMenPageContext } from '../context/MenPageContext';
+import { apiFetch } from '../services/api'; // 🔥 CLAVE
 
 const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
 
 export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentError }) => {
 
-  const { fetchPaymentMethods } = useMenPageContext(); // 🔥 AÑADIDO
-
-  const handleCloseClick = () => {
-    closePaymentModal();
-  };
+  const { fetchPaymentMethods } = useMenPageContext();
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -35,6 +32,9 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     },
   });
 
+  // ========================
+  // 🔥 INIT STRIPE
+  // ========================
   useEffect(() => {
     const initStripe = async () => {
       const stripe = await stripePromise;
@@ -54,6 +54,9 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     };
   }, []);
 
+  // ========================
+  // 🔥 INPUT HANDLER
+  // ========================
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -75,24 +78,18 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     }
   };
 
+  // ========================
+  // 🔥 SUBMIT
+  // ========================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    const token = localStorage.getItem('jwt');
-
     try {
-      const response = await fetch('http://localhost:3000/api/payments/create-setup-intent', {
+      // 🔥 1. CREATE SETUP INTENT (SIN localhost)
+      const { clientSecret } = await apiFetch('/api/payments/create-setup-intent', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
       });
-
-      console.log(token)
-
-      const { clientSecret } = await response.json();
 
       const stripe = stripeRef.current;
 
@@ -101,6 +98,7 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
         return;
       }
 
+      // 🔥 2. CONFIRM CARD
       const result = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
           card: cardRef.current,
@@ -119,36 +117,28 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
         return;
       }
 
-      const saveResponse = await fetch('http://localhost:3000/api/payments/save-payment-method', {
+      // 🔥 3. SAVE PAYMENT METHOD (SIN localhost)
+      const saveResponse = await apiFetch('/api/payments/save-payment-method', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // 🔥 AQUÍ VA
-        },
         body: JSON.stringify({
-          paymentMethodId: result.setupIntent.payment_method, // 🔥 SOLO ESTO
+          paymentMethodId: result.setupIntent.payment_method,
         }),
       });
 
-      if (saveResponse.status === 409) {
-        console.log('Tarjeta ya registrada');
+      if (saveResponse?.error === 'PAYMENT_METHOD_EXISTS') {
         onPaymentError();
         return;
       }
 
-      if (!saveResponse.ok) {
-        throw new Error('Error guardando método de pago');
-      }
-
-      // 🔥 AQUÍ ESTÁ LA CLAVE
-      await fetchPaymentMethods(); // refresca lista automáticamente
+      // 🔥 4. REFRESH LIST
+      await fetchPaymentMethods();
 
       setSuccess(true);
       setError(null);
 
     } catch (err) {
       console.error(err);
-      setError('Error guardando método de pago');
+      setError(err.message || 'Error guardando método de pago');
       setSuccess(false);
     }
   };
@@ -159,56 +149,26 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
       <form className="payment-modal__form" onSubmit={handleSubmit}>
 
         <div className="payment-modal__close-wrapper">
-          <button type="button" className="payment-modal__close-button" onClick={handleCloseClick}>
-            X
-          </button>
+          <button type="button" onClick={closePaymentModal}>X</button>
         </div>
 
-        <h2>Añadir metodo de pago</h2>
+        <h2>Añadir método de pago</h2>
 
-        <div className="payment-modal__input-group">
-          <input type="text" name="firstName" value={billingDetails.firstName} onChange={handleInputChange} placeholder="Nombre" />
-        </div>
+        <input name="firstName" value={billingDetails.firstName} onChange={handleInputChange} placeholder="Nombre" />
+        <input name="lastName" value={billingDetails.lastName} onChange={handleInputChange} placeholder="Apellido" />
+        <input name="email" value={billingDetails.email} onChange={handleInputChange} placeholder="correo@ejemplo.com" />
+        <input name="phone" value={billingDetails.phone} onChange={handleInputChange} placeholder="+1234567890" />
 
-        <div className="payment-modal__input-group">
-          <input type="text" name="lastName" value={billingDetails.lastName} onChange={handleInputChange} placeholder="Apellido" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="email" name="email" value={billingDetails.email} onChange={handleInputChange} placeholder="correo@ejemplo.com" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="tel" name="phone" value={billingDetails.phone} onChange={handleInputChange} placeholder="+1234567890" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="text" name="address.line1" value={billingDetails.address.line1} onChange={handleInputChange} placeholder="Calle Principal 123" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="text" name="address.line2" value={billingDetails.address.line2} onChange={handleInputChange} placeholder="Apartamento 456 (opcional)" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="text" name="address.city" value={billingDetails.address.city} onChange={handleInputChange} placeholder="Ciudad" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="text" name="address.state" value={billingDetails.address.state} onChange={handleInputChange} placeholder="Estado" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="text" name="address.postal_code" value={billingDetails.address.postal_code} onChange={handleInputChange} placeholder="12345" />
-        </div>
-
-        <div className="payment-modal__input-group">
-          <input type="text" name="address.country" value={billingDetails.address.country} onChange={handleInputChange} placeholder="MX" />
-        </div>
+        <input name="address.line1" value={billingDetails.address.line1} onChange={handleInputChange} placeholder="Calle Principal 123" />
+        <input name="address.line2" value={billingDetails.address.line2} onChange={handleInputChange} placeholder="Apartamento (opcional)" />
+        <input name="address.city" value={billingDetails.address.city} onChange={handleInputChange} placeholder="Ciudad" />
+        <input name="address.state" value={billingDetails.address.state} onChange={handleInputChange} placeholder="Estado" />
+        <input name="address.postal_code" value={billingDetails.address.postal_code} onChange={handleInputChange} placeholder="Código postal" />
+        <input name="address.country" value={billingDetails.address.country} onChange={handleInputChange} placeholder="MX" />
 
         <div id="card-element"></div>
 
-        <div id="card-errors">
+        <div>
           {error && <p style={{ color: 'red' }}>{error}</p>}
           {success && <p>✅ Método de pago guardado</p>}
         </div>
@@ -216,7 +176,6 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
         <button type="submit">Guardar tarjeta</button>
 
       </form>
-
     </div>
   );
 };

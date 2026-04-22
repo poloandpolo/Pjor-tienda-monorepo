@@ -6,17 +6,31 @@ import playera_logo_clasica_mujer_2 from '../images/playera_logo_clasica_mujer.j
 import black from '../images/Clothing_Colors/Black.jpg';
 import white from '../images/Clothing_Colors/white.jpg';
 
-// 🔥 IMPORTANTE
+// 🔥 services
 import { apiFetch } from '../services/api';
+import { getPaymentMethods } from '../services/paymentService'; // ✅ NUEVO
 
 const MenPageContext = createContext();
-const isAuthenticated = !!localStorage.getItem('jwt');
 
 export const useMenPageContext = () => {
   return useContext(MenPageContext);
 };
 
 export const MenPageContextProvider = ({ children }) => {
+
+  // ========================
+  // 🔐 AUTH
+  // ========================
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('jwt'));
+
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(!!localStorage.getItem('jwt'));
+    };
+
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, []);
 
   // ========================
   // 🛒 CART
@@ -111,7 +125,7 @@ export const MenPageContextProvider = ({ children }) => {
 
   const fetchPaymentMethods = async () => {
     try {
-      const data = await apiFetch('/api/payments/payment-methods');
+      const data = await getPaymentMethods(); // ✅ USANDO SERVICE
 
       if (Array.isArray(data)) {
         setPaymentMethods(data);
@@ -144,7 +158,7 @@ export const MenPageContextProvider = ({ children }) => {
         fetchAddresses,
         paymentMethods,
         fetchPaymentMethods,
-        isAuthenticated,
+        isAuthenticated, // ✅ ahora reactivo
       }}
     >
       {children}

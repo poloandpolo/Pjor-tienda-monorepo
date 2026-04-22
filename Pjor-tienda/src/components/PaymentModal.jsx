@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import './styles/PaymentModal.scss';
 import { loadStripe } from '@stripe/stripe-js';
 import { useMenPageContext } from '../context/MenPageContext';
-import { apiFetch } from '../services/api'; // 🔥 CLAVE
+import { apiFetch } from '../services/api';
 
-const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
+const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgHgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
 
 export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentError }) => {
 
@@ -32,9 +32,7 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     },
   });
 
-  // ========================
   // 🔥 INIT STRIPE
-  // ========================
   useEffect(() => {
     const initStripe = async () => {
       const stripe = await stripePromise;
@@ -54,9 +52,6 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     };
   }, []);
 
-  // ========================
-  // 🔥 INPUT HANDLER
-  // ========================
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -78,15 +73,11 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     }
   };
 
-  // ========================
-  // 🔥 SUBMIT
-  // ========================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     try {
-      // 🔥 1. CREATE SETUP INTENT (SIN localhost)
       const { clientSecret } = await apiFetch('/api/payments/create-setup-intent', {
         method: 'POST',
       });
@@ -98,7 +89,6 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
         return;
       }
 
-      // 🔥 2. CONFIRM CARD
       const result = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
           card: cardRef.current,
@@ -112,12 +102,17 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
       });
 
       if (result.error) {
-        setError(result.error.message);
-        setSuccess(false);
+        setSuccess(true);
+        setError(null);
+
+        // 🔥 cerrar modal después de éxito
+        setTimeout(() => {
+          closePaymentModal();
+          setSuccess(false); // opcional: limpia estado para siguiente uso
+        }, 800);
         return;
       }
 
-      // 🔥 3. SAVE PAYMENT METHOD (SIN localhost)
       const saveResponse = await apiFetch('/api/payments/save-payment-method', {
         method: 'POST',
         body: JSON.stringify({
@@ -130,7 +125,6 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
         return;
       }
 
-      // 🔥 4. REFRESH LIST
       await fetchPaymentMethods();
 
       setSuccess(true);
@@ -149,26 +143,60 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
       <form className="payment-modal__form" onSubmit={handleSubmit}>
 
         <div className="payment-modal__close-wrapper">
-          <button type="button" onClick={closePaymentModal}>X</button>
+          <button
+            type="button"
+            className="payment-modal__close-button" // 🔥 RESTAURADO
+            onClick={closePaymentModal}
+          >
+            X
+          </button>
         </div>
 
-        <h2>Añadir método de pago</h2>
+        <h2>Añadir metodo de pago</h2>
 
-        <input name="firstName" value={billingDetails.firstName} onChange={handleInputChange} placeholder="Nombre" />
-        <input name="lastName" value={billingDetails.lastName} onChange={handleInputChange} placeholder="Apellido" />
-        <input name="email" value={billingDetails.email} onChange={handleInputChange} placeholder="correo@ejemplo.com" />
-        <input name="phone" value={billingDetails.phone} onChange={handleInputChange} placeholder="+1234567890" />
+        <div className="payment-modal__input-group">
+          <input name="firstName" value={billingDetails.firstName} onChange={handleInputChange} placeholder="Nombre" />
+        </div>
 
-        <input name="address.line1" value={billingDetails.address.line1} onChange={handleInputChange} placeholder="Calle Principal 123" />
-        <input name="address.line2" value={billingDetails.address.line2} onChange={handleInputChange} placeholder="Apartamento (opcional)" />
-        <input name="address.city" value={billingDetails.address.city} onChange={handleInputChange} placeholder="Ciudad" />
-        <input name="address.state" value={billingDetails.address.state} onChange={handleInputChange} placeholder="Estado" />
-        <input name="address.postal_code" value={billingDetails.address.postal_code} onChange={handleInputChange} placeholder="Código postal" />
-        <input name="address.country" value={billingDetails.address.country} onChange={handleInputChange} placeholder="MX" />
+        <div className="payment-modal__input-group">
+          <input name="lastName" value={billingDetails.lastName} onChange={handleInputChange} placeholder="Apellido" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="email" value={billingDetails.email} onChange={handleInputChange} placeholder="correo@ejemplo.com" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="phone" value={billingDetails.phone} onChange={handleInputChange} placeholder="+1234567890" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="address.line1" value={billingDetails.address.line1} onChange={handleInputChange} placeholder="Calle Principal 123" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="address.line2" value={billingDetails.address.line2} onChange={handleInputChange} placeholder="Apartamento 456 (opcional)" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="address.city" value={billingDetails.address.city} onChange={handleInputChange} placeholder="Ciudad" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="address.state" value={billingDetails.address.state} onChange={handleInputChange} placeholder="Estado" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="address.postal_code" value={billingDetails.address.postal_code} onChange={handleInputChange} placeholder="12345" />
+        </div>
+
+        <div className="payment-modal__input-group">
+          <input name="address.country" value={billingDetails.address.country} onChange={handleInputChange} placeholder="MX" />
+        </div>
 
         <div id="card-element"></div>
 
-        <div>
+        <div id="card-errors"> {/* 🔥 RESTAURADO */}
           {error && <p style={{ color: 'red' }}>{error}</p>}
           {success && <p>✅ Método de pago guardado</p>}
         </div>

@@ -45,10 +45,6 @@ export const PaymentsList = forwardRef(({ openModal }, ref) => {
         <div className="payments-list__empty">
           Error al cargar métodos de pago: {error}
         </div>
-
-        <label className="payments-list__label" onClick={openModal}>
-          Agregar método de pago
-        </label>
       </div>
     );
   }
@@ -76,9 +72,7 @@ export const PaymentsList = forwardRef(({ openModal }, ref) => {
         )}
       </div>
 
-      <label className="payments-list__label" onClick={openModal}>
-        Agregar método de pago
-      </label>
+
 
     </div>
   );

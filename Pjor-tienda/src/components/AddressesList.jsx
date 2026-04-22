@@ -30,12 +30,9 @@ export const AddressesList = forwardRef((props, ref) => {
     },
   }));
 
-  // fetch inicial
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchAddresses();
-    }
-  }, [isAuthenticated]);
+ useEffect(() => {
+  fetchAddresses();
+}, []);
   
   // re-render slider
   useEffect(() => {

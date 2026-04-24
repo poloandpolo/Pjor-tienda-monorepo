@@ -5,14 +5,14 @@ const authRoutes = require('./routes/authRoutes');
 const addressRoutes = require('./routes/addressRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const productsRoutes = require('./routes/productRoutes'); // 🔥 NUEVO
 
 const app = express();
 
-// 🔥 CORS ROBUSTO (dinámico + seguro)
+// 🔥 CORS ROBUSTO
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  // Permitir localhost y cualquier vercel.app
   if (
     origin === 'http://localhost:5173' ||
     origin?.endsWith('.vercel.app')
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
 
-  res.setHeader('Vary', 'Origin'); // 🔥 IMPORTANTE para proxies
+  res.setHeader('Vary', 'Origin');
 
   res.setHeader(
     'Access-Control-Allow-Methods',
@@ -32,10 +32,8 @@ app.use((req, res, next) => {
     'Content-Type, Authorization'
   );
 
-  // ⚠️ SOLO si realmente usas cookies / sesiones
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  // 🔥 RESPUESTA PRE-FLIGHT SIEMPRE
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
@@ -45,19 +43,26 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// 🔥 HEALTH CHECK (útil en Render)
+// 🔥 HEALTH CHECK
 app.get('/', (req, res) => {
   res.send('Backend vivo');
 });
 
-// Rutas
+// =======================
+// ROUTES
+// =======================
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
+
 app.use('/api', addressRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 
-// Puerto
+app.use('/api/products', productsRoutes); // 🔥 NUEVO ENDPOINT
+
+// =======================
+// PORT
+// =======================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

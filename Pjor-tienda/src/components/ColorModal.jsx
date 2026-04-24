@@ -17,7 +17,7 @@ export const ColorModal = ({ isOpen, onClose, colors = [], onSelectColor }) => {
           {colors.length > 0 ? (
             colors.map((color, index) => (
               <label key={index} onClick={() => handleColorSelect(color)} className="color-modal__color-option">
-                <img src={color} alt={`color-${index}`} className="color-modal__color-thumbnail" />
+                <img src={color.image} alt={`color-${index}`} className="color-modal__color-thumbnail" />
               </label>
             ))
           ) : (

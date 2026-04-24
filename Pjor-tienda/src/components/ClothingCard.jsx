@@ -74,7 +74,7 @@ export const ClothingCard = ({ images, text, sizes, colors, id, price, isClothin
                 </label>
                 <label className='clothing-card__details-color' onClick={openColorModal}>
                     {selectedColor ? (
-                        <img src={selectedColor} alt="Selected Color" className='clothing-card__color-thumbnail' />
+                        <img src={colors.image} alt="Selected Color" className='clothing-card__color-thumbnail' />
                     ) : (
                         'Color'
                     )}

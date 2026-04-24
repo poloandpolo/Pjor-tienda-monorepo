@@ -12,7 +12,7 @@ log/
 
 # Entorno
 .env
-
+.env_local
 # Bases de datos locales
 *.sqlite
 *.sqlite3

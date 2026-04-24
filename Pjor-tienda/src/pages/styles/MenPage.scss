@@ -1,7 +1,14 @@
-.men-page{
-    width: 100vw;
+.men-page {
+    width: 100%;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     background-size: cover;
     background-image: url('/src/images/background-men-page2.JPG');
 }
 
+.men-page__clothing-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}

@@ -23,7 +23,7 @@ class ProductModel {
 
         return {
           id: product.id,
-          text: product.name, // mantiene compatibilidad con frontend actual
+          text: product.name,
           description: product.description,
           price: Number(product.price),
           category: product.category,
@@ -50,6 +50,24 @@ class ProductModel {
       (product) =>
         product.category === category ||
         product.category === 'unisex'
+    );
+  }
+
+  // 🔥 FALTABA ESTE
+  static async getProducts(category) {
+    if (category) {
+      return this.getProductsByCategory(category);
+    }
+
+    return this.getAllProducts();
+  }
+
+  // 🔥 FALTABA ESTE
+  static async getProductById(id) {
+    const products = await this.getAllProducts();
+
+    return products.find(
+      (product) => product.id === Number(id)
     );
   }
 }

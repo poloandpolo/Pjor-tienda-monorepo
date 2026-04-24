@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import './styles/MenPage.scss';
 import { NavigationBar } from '../components/NavigationBar';
@@ -6,15 +6,17 @@ import { ClothingMenuButton } from '../components/ClothingMenuButton';
 import { ShoppingCartButton } from '../components/ShoppingCartButton';
 import { ClothingBar } from '../components/ClothingBar';
 import { ClothingGallery } from '../components/ClothingGallery';
-import { useMenPageContext } from '../context/MenPageContext';
 import { ShoppingCart } from '../components/ShoppingCart';
 import { ClothingModal } from '../components/ClothingModal';
 import { ConfirmationModal } from '../components/ConfirmationModal';
-import { WarningModal } from '../components/WarningModal'; // Asegúrate de que el nombre coincida con tu archivo
+import { WarningModal } from '../components/WarningModal';
 import { Footer } from '../components/Footer';
 import { AccountButton } from '../components/AccountButton';
 import { AccountModal } from '../components/AccountModal';
 import { useNavigate } from 'react-router-dom';
+
+import { useMenPageContext } from '../context/MenPageContext';
+import { getProducts } from '../services/productService'; // 🔥 NUEVO
 
 const dropdownMenus = [
   {
@@ -51,18 +53,37 @@ export const MenPage = () => {
   const [clothingModalData, setClothingModalData] = useState(null);
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [isAccountModalVisible, setIsAccountModalVisible] = useState(false); // Nuevo estado para mostrar el modal
+  const [isAccountModalVisible, setIsAccountModalVisible] = useState(false);
 
-  const navigate = useNavigate()
+  const [menClothingItems, setMenClothingItems] = useState([]); // 🔥 NUEVO
+  const [loading, setLoading] = useState(true); // 🔥 NUEVO
 
-  const { menClothingItems } = useMenPageContext();
+  const navigate = useNavigate();
+
+  const { addToCart } = useMenPageContext();
+
+  // 🔥 FETCH PRODUCTS
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts('men');
+        setMenClothingItems(data);
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const toggleAccountModal = () => {
-    setIsAccountModalVisible(prevState => !prevState); // Cambiar la visibilidad del modal
+    setIsAccountModalVisible(prev => !prev);
   };
 
   const toggleClothingBar = () => {
-    setIsClothingBarOpen(prevState => !prevState);
+    setIsClothingBarOpen(prev => !prev);
   };
 
   const openShoppingCart = () => {
@@ -99,39 +120,45 @@ export const MenPage = () => {
     setIsConfirmationModalOpen(false);
   };
 
-  const handleClickPayment = () =>{
+  const handleClickPayment = () => {
     navigate('/checkout');
-    console.log('hola mundo')
-  }
+  };
 
   return (
     <div className='men-page'>
       <Header />
       <NavigationBar />
+
       <div className='men-page__clothing-section'>
+
         {!isClothingBarOpen && (
           <ClothingMenuButton
             toggleClothingBar={toggleClothingBar}
             isOpen={isClothingBarOpen}
           />
         )}
-        <AccountModal 
-        isVisible={isAccountModalVisible}
-        onClose={toggleAccountModal}
-         />
+
+        <AccountModal
+          isVisible={isAccountModalVisible}
+          onClose={toggleAccountModal}
+        />
+
         <AccountButton
           isOpen={isClothingBarOpen}
           onClick={toggleAccountModal}
         />
+
         <ShoppingCartButton
           onClick={openShoppingCart}
           isOpen={isClothingBarOpen}
         />
+
         <ShoppingCart
           isOpen={shoppingCartIsOpen}
           onClose={closeShoppingCart}
           onClickPayment={handleClickPayment}
         />
+
         <ClothingModal
           isOpen={isClothingModalOpen}
           onClose={closeClothingModal}
@@ -139,14 +166,17 @@ export const MenPage = () => {
           onWarning={openWarningModal}
           onConfirm={openConfirmationModal}
         />
+
         <ConfirmationModal
           isOpen={isConfirmationModalOpen}
           onClose={closeConfirmationModal}
         />
+
         <WarningModal
           isOpen={isWarningModalOpen}
           onClose={closeWarningModal}
         />
+
         {isClothingBarOpen && (
           <ClothingBar
             dropdownMenus={dropdownMenus}
@@ -154,14 +184,19 @@ export const MenPage = () => {
             toggleClothingBar={toggleClothingBar}
           />
         )}
-        <ClothingGallery
-          items={menClothingItems}
-          isClothingBarOpen={isClothingBarOpen}
-          onOpenClothingModal={openClothingModal}
-          onConfirm={openConfirmationModal}
-          onWarning={openWarningModal}
-        />
+
+        {!loading && (
+          <ClothingGallery
+            items={menClothingItems}
+            isClothingBarOpen={isClothingBarOpen}
+            onOpenClothingModal={openClothingModal}
+            onConfirm={openConfirmationModal}
+            onWarning={openWarningModal}
+          />
+        )}
+
       </div>
+
       <Footer />
     </div>
   );

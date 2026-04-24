@@ -1,4 +1,4 @@
-const ProductsModel = require('../models/productsModel');
+const ProductsModel = require('../models/productModel');
 
 class ProductsController {
   // GET /api/products

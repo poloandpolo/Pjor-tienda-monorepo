@@ -15,27 +15,40 @@ const CheckoutPage = () => {
   const { cartItems } = useMenPageContext();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [paymentModalOpen, setpaymentModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('shipping');
   const [errorModalOpen, setErrorModalOpen] = useState(false);
 
-  // 🔥 NUEVOS ESTADOS
+  // selección
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPayment, setSelectedPayment] = useState(null);
+
+  // loading checkout
   const [loadingCheckout, setLoadingCheckout] = useState(false);
 
-  const addressesListRef = useRef();
-  const paymentsListRef = useRef();
+  const addressesListRef = useRef(null);
+  const paymentsListRef = useRef(null);
 
   const navigate = useNavigate();
 
   const closeModal = () => setModalOpen(false);
   const openModal = () => setModalOpen(true);
 
-  const closePaymentModal = () => setpaymentModalOpen(false);
-  const openPaymentModal = () => setpaymentModalOpen(true);
+  const closePaymentModal = () => setPaymentModalOpen(false);
+  const openPaymentModal = () => setPaymentModalOpen(true);
 
-  // 🔥 CONFIRMAR COMPRA
+  const handleStoreClick = () => navigate(-1);
+
+  const handleAddressSubmit = (data) => {
+    console.log(data);
+
+    if (addressesListRef.current) {
+      setTimeout(() => {
+        addressesListRef.current.scrollToLast();
+      }, 0);
+    }
+  };
+
   const handleConfirm = async () => {
     if (!selectedAddress) {
       alert('Selecciona una dirección');
@@ -47,7 +60,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (cartItems.length === 0) {
+    if (!cartItems || cartItems.length === 0) {
       alert('Carrito vacío');
       return;
     }
@@ -65,7 +78,6 @@ const CheckoutPage = () => {
 
       alert('Pago exitoso');
       navigate('/');
-
     } catch (error) {
       console.error(error);
       alert('Error procesando pago');
@@ -74,34 +86,23 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleAddressSubmit = (data) => {
-    console.log(data);
-
-    if (addressesListRef.current) {
-      setTimeout(() => {
-        addressesListRef.current.scrollToLast();
-      }, 0);
-    }
-  };
-
   const cartCards = cartItems.map((item, index) => (
-    <ShoppingCartCard key={`${item.id}-${index}`} item={item} />
+    <ShoppingCartCard
+      key={`${item.id}-${index}`}
+      item={item}
+    />
   ));
-
-  const handleStoreClick = () => navigate(-1);
 
   return (
     <div className="checkout-page">
       <CheckoutHeader onClickStore={handleStoreClick} />
 
-      {/* Modal dirección */}
       <AddressForm
         onSubmit={handleAddressSubmit}
         modalOpen={modalOpen}
         closeModal={closeModal}
       />
 
-      {/* Modal pago */}
       <PaymentModal
         paymentModalOpen={paymentModalOpen}
         closePaymentModal={closePaymentModal}
@@ -114,7 +115,6 @@ const CheckoutPage = () => {
         }}
       />
 
-      {/* Error modal */}
       <PaymentErrorModal isOpen={errorModalOpen} />
 
       <div className="checkout-page__main-content">

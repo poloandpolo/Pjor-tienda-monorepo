@@ -1,21 +1,23 @@
 const express = require('express');
 const PaymentController = require('../controllers/paymentController');
-const verifyToken = require('../middlewares/verifyToken'); // 🔥 IMPORTANTE
+const verifyToken = require('../middlewares/verifyToken');
 
 const router = express.Router();
 
-// Crear PaymentIntent
+// LEGACY
 router.post('/create-payment-intent', PaymentController.createPaymentIntent);
-
-// Estado de pago
 router.get('/payment-status/:id', PaymentController.getPaymentStatus);
 
-// SetupIntent
+// Tarjetas guardadas
 router.post('/create-setup-intent', verifyToken, PaymentController.createSetupIntent);
-
-// Guardar método de pago
 router.post('/save-payment-method', verifyToken, PaymentController.savePaymentMethod);
-
 router.get('/payment-methods', verifyToken, PaymentController.getPaymentMethods);
+
+// NUEVO CHECKOUT REAL
+router.post('/checkout', verifyToken, PaymentController.checkout);
+
+// Historial
+router.get('/orders', verifyToken, PaymentController.getUserOrders);
+router.get('/orders/:id', verifyToken, PaymentController.getOrderById);
 
 module.exports = router;

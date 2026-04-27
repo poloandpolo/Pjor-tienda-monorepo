@@ -1,8 +1,5 @@
 import { apiFetch } from './api';
 
-// ========================
-// 💳 CREATE PAYMENT INTENT
-// ========================
 export const createPaymentIntent = async (payload) => {
   return apiFetch('/api/payments/create-payment-intent', {
     method: 'POST',
@@ -10,27 +7,21 @@ export const createPaymentIntent = async (payload) => {
   });
 };
 
-// ========================
-// 🔍 PAYMENT STATUS
-// ========================
+
 export const getPaymentStatus = async (id) => {
   return apiFetch(`/api/payments/payment-status/${id}`, {
     method: 'GET',
   });
 };
 
-// ========================
-// 🧾 SETUP INTENT (requiere JWT)
-// ========================
+
 export const createSetupIntent = async () => {
   return apiFetch('/api/payments/create-setup-intent', {
     method: 'POST',
   });
 };
 
-// ========================
-// 💾 SAVE PAYMENT METHOD (requiere JWT)
-// ========================
+
 export const savePaymentMethod = async (paymentMethodId) => {
   return apiFetch('/api/payments/save-payment-method', {
     method: 'POST',
@@ -38,11 +29,39 @@ export const savePaymentMethod = async (paymentMethodId) => {
   });
 };
 
-// ========================
-// 📄 GET PAYMENT METHODS (requiere JWT)
-// ========================
+
 export const getPaymentMethods = async () => {
   return apiFetch('/api/payments/payment-methods', {
+    method: 'GET',
+  });
+};
+
+
+export const checkout = async ({
+  shippingAddressId,
+  paymentMethodId,
+  cartItems,
+}) => {
+  return apiFetch('/api/payments/checkout', {
+    method: 'POST',
+    body: JSON.stringify({
+      shippingAddressId,
+      paymentMethodId,
+      cartItems,
+    }),
+  });
+};
+
+
+export const getOrders = async () => {
+  return apiFetch('/api/payments/orders', {
+    method: 'GET',
+  });
+};
+
+
+export const getOrderById = async (id) => {
+  return apiFetch(`/api/payments/orders/${id}`, {
     method: 'GET',
   });
 };

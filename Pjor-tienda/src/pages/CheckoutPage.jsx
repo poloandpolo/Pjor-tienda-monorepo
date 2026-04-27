@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { PaymentsList } from '../components/PaymentsList';
 import { PaymentModal } from '../components/PaymentModal';
 import { PaymentErrorModal } from '../components/PaymentErrorModal';
+import { checkout } from '../services/paymentService';
 
 const CheckoutPage = () => {
   const { cartItems } = useMenPageContext();
@@ -18,8 +19,13 @@ const CheckoutPage = () => {
   const [activeSection, setActiveSection] = useState('shipping');
   const [errorModalOpen, setErrorModalOpen] = useState(false);
 
+  // 🔥 NUEVOS ESTADOS
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [loadingCheckout, setLoadingCheckout] = useState(false);
+
   const addressesListRef = useRef();
-  const paymentsListRef = useRef(); // 🔥 NUEVO
+  const paymentsListRef = useRef();
 
   const navigate = useNavigate();
 
@@ -27,7 +33,46 @@ const CheckoutPage = () => {
   const openModal = () => setModalOpen(true);
 
   const closePaymentModal = () => setpaymentModalOpen(false);
-  const openPaymentModal = () => setpaymentModalOpen(true); // 🔥 NUEVO
+  const openPaymentModal = () => setpaymentModalOpen(true);
+
+  // 🔥 CONFIRMAR COMPRA
+  const handleConfirm = async () => {
+    if (!selectedAddress) {
+      alert('Selecciona una dirección');
+      return;
+    }
+
+    if (!selectedPayment) {
+      alert('Selecciona un método de pago');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      alert('Carrito vacío');
+      return;
+    }
+
+    try {
+      setLoadingCheckout(true);
+
+      const response = await checkout({
+        shippingAddressId: selectedAddress.id,
+        paymentMethodId: selectedPayment.id,
+        cartItems,
+      });
+
+      console.log(response);
+
+      alert('Pago exitoso');
+      navigate('/');
+
+    } catch (error) {
+      console.error(error);
+      alert('Error procesando pago');
+    } finally {
+      setLoadingCheckout(false);
+    }
+  };
 
   const handleAddressSubmit = (data) => {
     console.log(data);
@@ -39,8 +84,8 @@ const CheckoutPage = () => {
     }
   };
 
-  const cartCards = cartItems.map((item) => (
-    <ShoppingCartCard key={item.id} item={item} />
+  const cartCards = cartItems.map((item, index) => (
+    <ShoppingCartCard key={`${item.id}-${index}`} item={item} />
   ));
 
   const handleStoreClick = () => navigate(-1);
@@ -49,14 +94,14 @@ const CheckoutPage = () => {
     <div className="checkout-page">
       <CheckoutHeader onClickStore={handleStoreClick} />
 
-      {/* Modal de dirección */}
+      {/* Modal dirección */}
       <AddressForm
         onSubmit={handleAddressSubmit}
         modalOpen={modalOpen}
         closeModal={closeModal}
       />
 
-      {/* Modal de pago */}
+      {/* Modal pago */}
       <PaymentModal
         paymentModalOpen={paymentModalOpen}
         closePaymentModal={closePaymentModal}
@@ -77,21 +122,29 @@ const CheckoutPage = () => {
 
           <div className="checkout-page__details-buttons-wrapper">
             <button
-              className={`checkout-page__shipping-button ${activeSection === 'shipping' ? 'active' : ''}`}
+              className={`checkout-page__shipping-button ${
+                activeSection === 'shipping' ? 'active' : ''
+              }`}
               onClick={() => setActiveSection('shipping')}
             >
               envío
             </button>
 
             <button
-              className={`checkout-page__payment-button ${activeSection === 'payment' ? 'active' : ''}`}
+              className={`checkout-page__payment-button ${
+                activeSection === 'payment' ? 'active' : ''
+              }`}
               onClick={() => setActiveSection('payment')}
             >
               pago
             </button>
 
-            <button className="checkout-page__confirmation-button">
-              Confirmar
+            <button
+              className="checkout-page__confirmation-button"
+              onClick={handleConfirm}
+              disabled={loadingCheckout}
+            >
+              {loadingCheckout ? 'Procesando...' : 'Confirmar'}
             </button>
           </div>
 
@@ -100,6 +153,8 @@ const CheckoutPage = () => {
               <AddressesList
                 ref={addressesListRef}
                 openModal={openModal}
+                selectedAddress={selectedAddress}
+                setSelectedAddress={setSelectedAddress}
               />
 
               <div className="checkout-page__add-address">
@@ -115,6 +170,8 @@ const CheckoutPage = () => {
               <PaymentsList
                 ref={paymentsListRef}
                 openModal={openPaymentModal}
+                selectedPayment={selectedPayment}
+                setSelectedPayment={setSelectedPayment}
               />
 
               <div className="checkout-page__add-payment">

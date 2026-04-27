@@ -4,7 +4,28 @@ const db = require('../db/db.js');
 
 class PaymentController {
 
-  // 🔥 EXISTENTE (ajustado a JWT opcional)
+  // ==================================================
+  // 🔥 HELPER LOGS
+  // ==================================================
+  static logError(scope, error, extra = {}) {
+    console.error(`\n================ ${scope} ERROR ================`);
+    console.error('Message:', error.message);
+    console.error('Code:', error.code || 'N/A');
+    console.error('Type:', error.type || 'N/A');
+
+    if (error.raw) {
+      console.error('Stripe Raw:', error.raw);
+    }
+
+    if (Object.keys(extra).length) {
+      console.error('Context:', extra);
+    }
+
+    console.error(error.stack);
+    console.error('===============================================\n');
+  }
+
+  // 🔥 EXISTENTE
   static async createPaymentIntent(req, res) {
     const { amount, currency, paymentMethodId } = req.body;
     const userId = req.userId;
@@ -24,7 +45,9 @@ class PaymentController {
       const user = await db('users').where({ id: userId }).first();
 
       if (!user || !user.stripe_customer_id) {
-        return res.status(400).json({ error: "Usuario sin customer en Stripe" });
+        return res.status(400).json({
+          error: "Usuario sin customer en Stripe"
+        });
       }
 
       const paymentIntent = await stripe.paymentIntents.create({
@@ -47,6 +70,13 @@ class PaymentController {
       return res.status(200).json({ paymentIntent });
 
     } catch (error) {
+      this.logError('CREATE PAYMENT INTENT', error, {
+        userId,
+        amount,
+        currency,
+        paymentMethodId
+      });
+
       return res.status(500).json({ error: error.message });
     }
   }
@@ -58,12 +88,16 @@ class PaymentController {
       const payment = await PaymentModel.findPaymentById(id);
 
       if (!payment) {
-        return res.status(404).json({ error: "Pago no encontrado" });
+        return res.status(404).json({
+          error: "Pago no encontrado"
+        });
       }
 
       return res.status(200).json(payment);
 
     } catch (error) {
+      this.logError('GET PAYMENT STATUS', error, { id });
+
       return res.status(500).json({ error: error.message });
     }
   }
@@ -72,10 +106,14 @@ class PaymentController {
     const userId = req.userId;
 
     try {
-      const user = await db('users').where({ id: userId }).first();
+      const user = await db('users')
+        .where({ id: userId })
+        .first();
 
       if (!user) {
-        return res.status(404).json({ error: "Usuario no encontrado" });
+        return res.status(404).json({
+          error: "Usuario no encontrado"
+        });
       }
 
       let stripeCustomerId = user.stripe_customer_id;
@@ -89,16 +127,22 @@ class PaymentController {
 
         await db('users')
           .where({ id: userId })
-          .update({ stripe_customer_id: stripeCustomerId });
+          .update({
+            stripe_customer_id: stripeCustomerId
+          });
       }
 
       const setupIntent = await stripe.setupIntents.create({
         customer: stripeCustomerId,
       });
 
-      return res.json({ clientSecret: setupIntent.client_secret });
+      return res.json({
+        clientSecret: setupIntent.client_secret
+      });
 
     } catch (error) {
+      this.logError('CREATE SETUP INTENT', error, { userId });
+
       return res.status(500).json({ error: error.message });
     }
   }
@@ -108,24 +152,36 @@ class PaymentController {
     const { paymentMethodId } = req.body;
 
     if (!paymentMethodId) {
-      return res.status(400).json({ error: "paymentMethodId requerido" });
+      return res.status(400).json({
+        error: "paymentMethodId requerido"
+      });
     }
 
     try {
-      const paymentMethod = await PaymentModel.savePaymentMethod(
-        userId,
-        paymentMethodId
-      );
+      const paymentMethod =
+        await PaymentModel.savePaymentMethod(
+          userId,
+          paymentMethodId
+        );
 
       return res.json(paymentMethod);
 
     } catch (error) {
 
       if (error.code === 'PAYMENT_METHOD_EXISTS') {
-        return res.status(409).json({ error: error.code });
+        return res.status(409).json({
+          error: error.code
+        });
       }
 
-      return res.status(500).json({ error: error.message });
+      this.logError('SAVE PAYMENT METHOD', error, {
+        userId,
+        paymentMethodId
+      });
+
+      return res.status(500).json({
+        error: error.message
+      });
     }
   }
 
@@ -140,13 +196,16 @@ class PaymentController {
       return res.json(paymentMethods);
 
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      this.logError('GET PAYMENT METHODS', error, { userId });
+
+      return res.status(500).json({
+        error: error.message
+      });
     }
   }
 
   // ==================================================
-  // 🔥 NUEVO CHECKOUT REAL
-  // POST /api/payments/checkout
+  // 🔥 CHECKOUT
   // ==================================================
   static async checkout(req, res) {
     const userId = req.userId;
@@ -172,12 +231,12 @@ class PaymentController {
 
       if (!user || !user.stripe_customer_id) {
         await trx.rollback();
+
         return res.status(400).json({
           error: 'Usuario sin customer en Stripe'
         });
       }
 
-      // 🔥 Obtener productos reales desde DB
       const productIds = cartItems.map(item => item.id);
 
       const products = await trx('products')
@@ -186,19 +245,23 @@ class PaymentController {
 
       if (!products.length) {
         await trx.rollback();
+
         return res.status(400).json({
           error: 'Productos inválidos'
         });
       }
 
-      // 🔥 calcular subtotal
       let subtotal = 0;
 
       const itemsPrepared = cartItems.map(item => {
-        const product = products.find(p => p.id === item.id);
+        const product = products.find(
+          p => p.id === item.id
+        );
 
         if (!product) {
-          throw new Error(`Producto ${item.id} no encontrado`);
+          throw new Error(
+            `Producto ${item.id} no encontrado`
+          );
         }
 
         const unitPrice = Number(product.price);
@@ -220,7 +283,6 @@ class PaymentController {
       const taxes = 0;
       const total = subtotal + shippingCost + taxes;
 
-      // 🔥 Crear order
       const [order] = await trx('orders')
         .insert({
           user_id: userId,
@@ -235,7 +297,6 @@ class PaymentController {
         })
         .returning('*');
 
-      // 🔥 Insertar items
       const orderItems = itemsPrepared.map(item => ({
         order_id: order.id,
         ...item
@@ -243,17 +304,16 @@ class PaymentController {
 
       await trx('order_items').insert(orderItems);
 
-      // 🔥 Cobro Stripe
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: total * 100, // pesos a centavos
-        currency: 'mxn',
-        customer: user.stripe_customer_id,
-        payment_method: paymentMethodId,
-        off_session: true,
-        confirm: true
-      });
+      const paymentIntent =
+        await stripe.paymentIntents.create({
+          amount: total * 100,
+          currency: 'mxn',
+          customer: user.stripe_customer_id,
+          payment_method: paymentMethodId,
+          off_session: true,
+          confirm: true
+        });
 
-      // 🔥 Registrar pago
       await trx('payments').insert({
         payment_intent_id: paymentIntent.id,
         amount: total,
@@ -264,7 +324,6 @@ class PaymentController {
         status: paymentIntent.status
       });
 
-      // 🔥 Si cobrado
       if (paymentIntent.status === 'succeeded') {
         await trx('orders')
           .where({ id: order.id })
@@ -285,15 +344,19 @@ class PaymentController {
     } catch (error) {
       await trx.rollback();
 
+      this.logError('CHECKOUT', error, {
+        userId,
+        shippingAddressId,
+        paymentMethodId,
+        cartItems
+      });
+
       return res.status(500).json({
         error: error.message
       });
     }
   }
 
-  // ==================================================
-  // 🔥 HISTORIAL DE ÓRDENES
-  // ==================================================
   static async getUserOrders(req, res) {
     const userId = req.userId;
 
@@ -305,7 +368,13 @@ class PaymentController {
       return res.json(orders);
 
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      this.logError('GET USER ORDERS', error, {
+        userId
+      });
+
+      return res.status(500).json({
+        error: error.message
+      });
     }
   }
 
@@ -336,7 +405,14 @@ class PaymentController {
       });
 
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      this.logError('GET ORDER BY ID', error, {
+        userId,
+        id
+      });
+
+      return res.status(500).json({
+        error: error.message
+      });
     }
   }
 }

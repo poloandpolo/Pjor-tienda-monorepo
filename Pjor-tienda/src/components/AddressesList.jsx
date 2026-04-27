@@ -47,6 +47,16 @@ export const AddressesList = forwardRef(
       setSliderKey((prev) => prev + 1);
     }, [addresses]);
 
+    // 🔥 NUEVO: seleccionar primera dirección automáticamente
+    useEffect(() => {
+      if (
+        addresses.length > 0 &&
+        !selectedAddress
+      ) {
+        setSelectedAddress(addresses[0]);
+      }
+    }, [addresses, selectedAddress, setSelectedAddress]);
+
     const sliderSettings = {
       dots: false,
       infinite: false,

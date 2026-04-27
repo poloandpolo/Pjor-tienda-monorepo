@@ -12,7 +12,7 @@ import { PaymentErrorModal } from '../components/PaymentErrorModal';
 import { checkout } from '../services/paymentService';
 
 const CheckoutPage = () => {
-  const { cartItems } = useMenPageContext();
+  const { cartItems = [] } = useMenPageContext();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -60,7 +60,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (!cartItems || cartItems.length === 0) {
+    if (!cartItems.length) {
       alert('Carrito vacío');
       return;
     }
@@ -153,8 +153,7 @@ const CheckoutPage = () => {
               <AddressesList
                 ref={addressesListRef}
                 openModal={openModal}
-                selectedAddress={selectedAddress}
-                setSelectedAddress={setSelectedAddress}
+                onSelectAddress={setSelectedAddress}
               />
 
               <div className="checkout-page__add-address">
@@ -170,8 +169,7 @@ const CheckoutPage = () => {
               <PaymentsList
                 ref={paymentsListRef}
                 openModal={openPaymentModal}
-                selectedPayment={selectedPayment}
-                setSelectedPayment={setSelectedPayment}
+                onSelectPayment={setSelectedPayment}
               />
 
               <div className="checkout-page__add-payment">

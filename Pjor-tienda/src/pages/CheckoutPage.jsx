@@ -19,11 +19,8 @@ const CheckoutPage = () => {
   const [activeSection, setActiveSection] = useState('shipping');
   const [errorModalOpen, setErrorModalOpen] = useState(false);
 
-  // selección
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPayment, setSelectedPayment] = useState(null);
-
-  // loading checkout
   const [loadingCheckout, setLoadingCheckout] = useState(false);
 
   const addressesListRef = useRef(null);
@@ -153,7 +150,8 @@ const CheckoutPage = () => {
               <AddressesList
                 ref={addressesListRef}
                 openModal={openModal}
-                onSelectAddress={setSelectedAddress}
+                selectedAddress={selectedAddress}
+                setSelectedAddress={setSelectedAddress}
               />
 
               <div className="checkout-page__add-address">
@@ -169,7 +167,8 @@ const CheckoutPage = () => {
               <PaymentsList
                 ref={paymentsListRef}
                 openModal={openPaymentModal}
-                onSelectPayment={setSelectedPayment}
+                selectedPayment={selectedPayment}
+                setSelectedPayment={setSelectedPayment}
               />
 
               <div className="checkout-page__add-payment">

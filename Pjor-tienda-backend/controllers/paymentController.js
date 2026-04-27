@@ -255,7 +255,7 @@ class PaymentController {
   }
 
   // ==================================================
-  // 🔥 CHECKOUT
+  // 🔥 CHECKOUT CORREGIDO
   // ==================================================
   static async checkout(req, res) {
     const userId = req.userId;
@@ -292,6 +292,25 @@ class PaymentController {
         return res.status(400).json({
           error:
             'Usuario sin customer en Stripe',
+        });
+      }
+
+      // 🔥 VALIDAR MÉTODO DE PAGO DEL USUARIO
+      const savedMethod = await trx(
+        'payment_methods'
+      )
+        .where({
+          id: paymentMethodId,
+          user_id: userId,
+        })
+        .first();
+
+      if (!savedMethod) {
+        await trx.rollback();
+
+        return res.status(404).json({
+          error:
+            'Método de pago no encontrado',
         });
       }
 
@@ -394,6 +413,7 @@ class PaymentController {
         orderItems
       );
 
+      // 🔥 AQUÍ ESTABA EL ERROR
       const paymentIntent =
         await stripe.paymentIntents.create({
           amount: Math.round(
@@ -403,7 +423,7 @@ class PaymentController {
           customer:
             user.stripe_customer_id,
           payment_method:
-            paymentMethodId,
+            savedMethod.stripe_payment_method_id,
           off_session: true,
           confirm: true,
         });

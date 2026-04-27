@@ -13,20 +13,24 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 export const AddressesList = forwardRef(
-  ({ onSelectAddress, openModal }, ref) => {
+  (
+    {
+      selectedAddress,
+      setSelectedAddress,
+      openModal,
+    },
+    ref
+  ) => {
     const {
       addresses = [],
       error,
       fetchAddresses,
-      isAuthenticated,
     } = useMenPageContext();
 
-    const [selectedAddress, setSelectedAddress] = useState(null);
     const [sliderKey, setSliderKey] = useState(0);
 
     const sliderRef = useRef(null);
 
-    // scroll control
     useImperativeHandle(ref, () => ({
       scrollToLast: () => {
         if (sliderRef.current && addresses.length > 0) {
@@ -39,7 +43,6 @@ export const AddressesList = forwardRef(
       fetchAddresses();
     }, []);
 
-    // re-render slider
     useEffect(() => {
       setSliderKey((prev) => prev + 1);
     }, [addresses]);
@@ -55,14 +58,8 @@ export const AddressesList = forwardRef(
 
     const handleSelection = (address) => {
       setSelectedAddress(address);
-
-      // 🔥 nuevo: enviar selección al padre
-      if (onSelectAddress) {
-        onSelectAddress(address);
-      }
     };
 
-    // error state
     if (error) {
       return (
         <div className="addresses-list__content">

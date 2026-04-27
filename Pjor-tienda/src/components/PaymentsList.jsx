@@ -10,11 +10,18 @@ import { useMenPageContext } from '../context/MenPageContext';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-// 🔥 igual que AddressItem pero para pagos
 import { PaymentItem } from './PaymentItem';
 
 export const PaymentsList = forwardRef(
-  ({ openModal, onSelectPayment }, ref) => {
+  (
+    {
+      openModal,
+      selectedPayment: parentSelectedPayment,
+      setSelectedPayment: setParentSelectedPayment,
+      onSelectPayment,
+    },
+    ref
+  ) => {
     const {
       paymentMethods = [],
       error,
@@ -45,30 +52,37 @@ export const PaymentsList = forwardRef(
       slidesToScroll: 1,
     };
 
-    const handleSelection = (payment) => {
-      setSelectedPayment(payment);
+    const notifyParent = (payment) => {
+      if (setParentSelectedPayment) {
+        setParentSelectedPayment(payment);
+      }
 
-      // 🔥 NUEVO → enviar selección al padre
       if (onSelectPayment) {
         onSelectPayment(payment);
       }
     };
 
-    // 🔥 Auto seleccionar primera tarjeta disponible
+    const handleSelection = (payment) => {
+      setSelectedPayment(payment);
+      notifyParent(payment);
+    };
+
+    // Auto seleccionar primera tarjeta
     useEffect(() => {
-      if (
-        paymentMethods.length > 0 &&
-        !selectedPayment
-      ) {
+      if (paymentMethods.length > 0 && !selectedPayment) {
         const firstPayment = paymentMethods[0];
 
         setSelectedPayment(firstPayment);
-
-        if (onSelectPayment) {
-          onSelectPayment(firstPayment);
-        }
+        notifyParent(firstPayment);
       }
     }, [paymentMethods]);
+
+    // Si el padre cambia el valor, sincronizar visualmente
+    useEffect(() => {
+      if (parentSelectedPayment) {
+        setSelectedPayment(parentSelectedPayment);
+      }
+    }, [parentSelectedPayment]);
 
     if (error) {
       return (

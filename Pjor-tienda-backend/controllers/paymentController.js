@@ -3,17 +3,16 @@ const PaymentModel = require('../models/paymentModel');
 const db = require('../db/db.js');
 
 class PaymentController {
-
   // ==================================================
   // 🔥 HELPER LOGS
   // ==================================================
   static logError(scope, error, extra = {}) {
     console.error(`\n================ ${scope} ERROR ================`);
-    console.error('Message:', error.message);
-    console.error('Code:', error.code || 'N/A');
-    console.error('Type:', error.type || 'N/A');
+    console.error('Message:', error?.message || 'Sin mensaje');
+    console.error('Code:', error?.code || 'N/A');
+    console.error('Type:', error?.type || 'N/A');
 
-    if (error.raw) {
+    if (error?.raw) {
       console.error('Stripe Raw:', error.raw);
     }
 
@@ -21,43 +20,59 @@ class PaymentController {
       console.error('Context:', extra);
     }
 
-    console.error(error.stack);
+    if (error?.stack) {
+      console.error(error.stack);
+    }
+
     console.error('===============================================\n');
   }
 
+  // ==================================================
   // 🔥 EXISTENTE
+  // ==================================================
   static async createPaymentIntent(req, res) {
     const { amount, currency, paymentMethodId } = req.body;
     const userId = req.userId;
 
     if (!amount || !currency) {
-      return res.status(400).json({ error: "Faltan parámetros necesarios" });
+      return res.status(400).json({
+        error: 'Faltan parámetros necesarios',
+      });
     }
 
     try {
       if (!userId) {
         const { clientSecret, paymentId } =
-          await PaymentModel.createPaymentIntent(amount, currency);
+          await PaymentModel.createPaymentIntent(
+            amount,
+            currency
+          );
 
-        return res.status(200).json({ clientSecret, paymentId });
-      }
-
-      const user = await db('users').where({ id: userId }).first();
-
-      if (!user || !user.stripe_customer_id) {
-        return res.status(400).json({
-          error: "Usuario sin customer en Stripe"
+        return res.status(200).json({
+          clientSecret,
+          paymentId,
         });
       }
 
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency,
-        customer: user.stripe_customer_id,
-        payment_method: paymentMethodId,
-        off_session: true,
-        confirm: true,
-      });
+      const user = await db('users')
+        .where({ id: userId })
+        .first();
+
+      if (!user || !user.stripe_customer_id) {
+        return res.status(400).json({
+          error: 'Usuario sin customer en Stripe',
+        });
+      }
+
+      const paymentIntent =
+        await stripe.paymentIntents.create({
+          amount,
+          currency,
+          customer: user.stripe_customer_id,
+          payment_method: paymentMethodId,
+          off_session: true,
+          confirm: true,
+        });
 
       await db('payments').insert({
         payment_intent_id: paymentIntent.id,
@@ -67,17 +82,24 @@ class PaymentController {
         user_id: userId,
       });
 
-      return res.status(200).json({ paymentIntent });
-
-    } catch (error) {
-      this.logError('CREATE PAYMENT INTENT', error, {
-        userId,
-        amount,
-        currency,
-        paymentMethodId
+      return res.status(200).json({
+        paymentIntent,
       });
+    } catch (error) {
+      PaymentController.logError(
+        'CREATE PAYMENT INTENT',
+        error,
+        {
+          userId,
+          amount,
+          currency,
+          paymentMethodId,
+        }
+      );
 
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({
+        error: error.message,
+      });
     }
   }
 
@@ -85,20 +107,26 @@ class PaymentController {
     const { id } = req.params;
 
     try {
-      const payment = await PaymentModel.findPaymentById(id);
+      const payment =
+        await PaymentModel.findPaymentById(id);
 
       if (!payment) {
         return res.status(404).json({
-          error: "Pago no encontrado"
+          error: 'Pago no encontrado',
         });
       }
 
       return res.status(200).json(payment);
-
     } catch (error) {
-      this.logError('GET PAYMENT STATUS', error, { id });
+      PaymentController.logError(
+        'GET PAYMENT STATUS',
+        error,
+        { id }
+      );
 
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({
+        error: error.message,
+      });
     }
   }
 
@@ -112,38 +140,48 @@ class PaymentController {
 
       if (!user) {
         return res.status(404).json({
-          error: "Usuario no encontrado"
+          error: 'Usuario no encontrado',
         });
       }
 
-      let stripeCustomerId = user.stripe_customer_id;
+      let stripeCustomerId =
+        user.stripe_customer_id;
 
       if (!stripeCustomerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
-        });
+        const customer =
+          await stripe.customers.create({
+            email: user.email,
+          });
 
         stripeCustomerId = customer.id;
 
         await db('users')
           .where({ id: userId })
           .update({
-            stripe_customer_id: stripeCustomerId
+            stripe_customer_id:
+              stripeCustomerId,
           });
       }
 
-      const setupIntent = await stripe.setupIntents.create({
-        customer: stripeCustomerId,
-      });
+      const setupIntent =
+        await stripe.setupIntents.create({
+          customer: stripeCustomerId,
+        });
 
       return res.json({
-        clientSecret: setupIntent.client_secret
+        clientSecret:
+          setupIntent.client_secret,
       });
-
     } catch (error) {
-      this.logError('CREATE SETUP INTENT', error, { userId });
+      PaymentController.logError(
+        'CREATE SETUP INTENT',
+        error,
+        { userId }
+      );
 
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({
+        error: error.message,
+      });
     }
   }
 
@@ -153,7 +191,7 @@ class PaymentController {
 
     if (!paymentMethodId) {
       return res.status(400).json({
-        error: "paymentMethodId requerido"
+        error: 'paymentMethodId requerido',
       });
     }
 
@@ -165,22 +203,27 @@ class PaymentController {
         );
 
       return res.json(paymentMethod);
-
     } catch (error) {
-
-      if (error.code === 'PAYMENT_METHOD_EXISTS') {
+      if (
+        error.code ===
+        'PAYMENT_METHOD_EXISTS'
+      ) {
         return res.status(409).json({
-          error: error.code
+          error: error.code,
         });
       }
 
-      this.logError('SAVE PAYMENT METHOD', error, {
-        userId,
-        paymentMethodId
-      });
+      PaymentController.logError(
+        'SAVE PAYMENT METHOD',
+        error,
+        {
+          userId,
+          paymentMethodId,
+        }
+      );
 
       return res.status(500).json({
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -189,17 +232,24 @@ class PaymentController {
     const userId = req.userId;
 
     try {
-      const paymentMethods = await db('payment_methods')
-        .where({ user_id: userId })
-        .orderBy('created_at', 'desc');
+      const paymentMethods =
+        await db('payment_methods')
+          .where({ user_id: userId })
+          .orderBy(
+            'created_at',
+            'desc'
+          );
 
       return res.json(paymentMethods);
-
     } catch (error) {
-      this.logError('GET PAYMENT METHODS', error, { userId });
+      PaymentController.logError(
+        'GET PAYMENT METHODS',
+        error,
+        { userId }
+      );
 
       return res.status(500).json({
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -213,18 +263,25 @@ class PaymentController {
     const {
       shippingAddressId,
       paymentMethodId,
-      cartItems
+      cartItems,
     } = req.body;
 
-    if (!shippingAddressId || !paymentMethodId || !cartItems?.length) {
+    if (
+      !shippingAddressId ||
+      !paymentMethodId ||
+      !cartItems?.length
+    ) {
       return res.status(400).json({
-        error: 'Datos incompletos para checkout'
+        error:
+          'Datos incompletos para checkout',
       });
     }
 
-    const trx = await db.transaction();
+    let trx = null;
 
     try {
+      trx = await db.transaction();
+
       const user = await trx('users')
         .where({ id: userId })
         .first();
@@ -233,13 +290,18 @@ class PaymentController {
         await trx.rollback();
 
         return res.status(400).json({
-          error: 'Usuario sin customer en Stripe'
+          error:
+            'Usuario sin customer en Stripe',
         });
       }
 
-      const productIds = cartItems.map(item => item.id);
+      const productIds = cartItems.map(
+        (item) => item.id
+      );
 
-      const products = await trx('products')
+      const products = await trx(
+        'products'
+      )
         .whereIn('id', productIds)
         .where({ active: true });
 
@@ -247,88 +309,126 @@ class PaymentController {
         await trx.rollback();
 
         return res.status(400).json({
-          error: 'Productos inválidos'
+          error: 'Productos inválidos',
         });
       }
 
       let subtotal = 0;
 
-      const itemsPrepared = cartItems.map(item => {
-        const product = products.find(
-          p => p.id === item.id
-        );
-
-        if (!product) {
-          throw new Error(
-            `Producto ${item.id} no encontrado`
+      const itemsPrepared = cartItems.map(
+        (item) => {
+          const product = products.find(
+            (p) => p.id === item.id
           );
+
+          if (!product) {
+            throw new Error(
+              `Producto ${item.id} no encontrado`
+            );
+          }
+
+          const unitPrice = Number(
+            product.price
+          );
+
+          const quantity = Number(
+            item.quantity
+          );
+
+          subtotal +=
+            unitPrice * quantity;
+
+          return {
+            product_id: product.id,
+            name: product.name,
+            price: unitPrice,
+            quantity,
+            size:
+              item.size || null,
+            color:
+              item.color || null,
+          };
         }
-
-        const unitPrice = Number(product.price);
-        const quantity = Number(item.quantity);
-
-        subtotal += unitPrice * quantity;
-
-        return {
-          product_id: product.id,
-          name: product.name,
-          price: unitPrice,
-          quantity,
-          size: item.size || null,
-          color: item.color || null
-        };
-      });
+      );
 
       const shippingCost = 0;
       const taxes = 0;
-      const total = subtotal + shippingCost + taxes;
+      const total =
+        subtotal +
+        shippingCost +
+        taxes;
 
-      const [order] = await trx('orders')
-        .insert({
-          user_id: userId,
-          shipping_address_id: shippingAddressId,
-          payment_method_id: paymentMethodId,
-          status: 'pending',
-          subtotal,
-          shipping_cost: shippingCost,
-          taxes,
-          total_amount: total,
-          currency: 'mxn'
-        })
-        .returning('*');
+      const insertedOrder =
+        await trx('orders')
+          .insert({
+            user_id: userId,
+            shipping_address_id:
+              shippingAddressId,
+            payment_method_id:
+              paymentMethodId,
+            status: 'pending',
+            subtotal,
+            shipping_cost:
+              shippingCost,
+            taxes,
+            total_amount: total,
+            currency: 'mxn',
+          })
+          .returning('*');
 
-      const orderItems = itemsPrepared.map(item => ({
-        order_id: order.id,
-        ...item
-      }));
+      const order = Array.isArray(
+        insertedOrder
+      )
+        ? insertedOrder[0]
+        : insertedOrder;
 
-      await trx('order_items').insert(orderItems);
+      const orderItems =
+        itemsPrepared.map(
+          (item) => ({
+            order_id: order.id,
+            ...item,
+          })
+        );
+
+      await trx('order_items').insert(
+        orderItems
+      );
 
       const paymentIntent =
         await stripe.paymentIntents.create({
-          amount: total * 100,
+          amount: Math.round(
+            total * 100
+          ),
           currency: 'mxn',
-          customer: user.stripe_customer_id,
-          payment_method: paymentMethodId,
+          customer:
+            user.stripe_customer_id,
+          payment_method:
+            paymentMethodId,
           off_session: true,
-          confirm: true
+          confirm: true,
         });
 
       await trx('payments').insert({
-        payment_intent_id: paymentIntent.id,
+        payment_intent_id:
+          paymentIntent.id,
         amount: total,
         currency: 'mxn',
         user_id: userId,
         order_id: order.id,
-        payment_method_id: paymentMethodId,
-        status: paymentIntent.status
+        payment_method_id:
+          paymentMethodId,
+        status:
+          paymentIntent.status,
       });
 
-      if (paymentIntent.status === 'succeeded') {
+      if (
+        paymentIntent.status ===
+        'succeeded'
+      ) {
         await trx('orders')
           .where({ id: order.id })
           .update({
-            status: 'paid'
+            status: 'paid',
           });
       }
 
@@ -337,43 +437,59 @@ class PaymentController {
       return res.status(200).json({
         success: true,
         orderId: order.id,
-        paymentIntentId: paymentIntent.id,
-        status: paymentIntent.status
+        paymentIntentId:
+          paymentIntent.id,
+        status:
+          paymentIntent.status,
       });
-
     } catch (error) {
-      await trx.rollback();
+      if (trx) {
+        try {
+          await trx.rollback();
+        } catch (_) {}
+      }
 
-      this.logError('CHECKOUT', error, {
-        userId,
-        shippingAddressId,
-        paymentMethodId,
-        cartItems
-      });
+      PaymentController.logError(
+        'CHECKOUT',
+        error,
+        {
+          userId,
+          shippingAddressId,
+          paymentMethodId,
+          cartItems,
+        }
+      );
 
       return res.status(500).json({
-        error: error.message
+        error: error.message,
       });
     }
   }
 
+  // ==================================================
+  // 🔥 ÓRDENES
+  // ==================================================
   static async getUserOrders(req, res) {
     const userId = req.userId;
 
     try {
       const orders = await db('orders')
         .where({ user_id: userId })
-        .orderBy('created_at', 'desc');
+        .orderBy(
+          'created_at',
+          'desc'
+        );
 
       return res.json(orders);
-
     } catch (error) {
-      this.logError('GET USER ORDERS', error, {
-        userId
-      });
+      PaymentController.logError(
+        'GET USER ORDERS',
+        error,
+        { userId }
+      );
 
       return res.status(500).json({
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -386,32 +502,39 @@ class PaymentController {
       const order = await db('orders')
         .where({
           id,
-          user_id: userId
+          user_id: userId,
         })
         .first();
 
       if (!order) {
         return res.status(404).json({
-          error: 'Orden no encontrada'
+          error:
+            'Orden no encontrada',
         });
       }
 
-      const items = await db('order_items')
-        .where({ order_id: id });
+      const items = await db(
+        'order_items'
+      ).where({
+        order_id: id,
+      });
 
       return res.json({
         ...order,
-        items
+        items,
       });
-
     } catch (error) {
-      this.logError('GET ORDER BY ID', error, {
-        userId,
-        id
-      });
+      PaymentController.logError(
+        'GET ORDER BY ID',
+        error,
+        {
+          userId,
+          id,
+        }
+      );
 
       return res.status(500).json({
-        error: error.message
+        error: error.message,
       });
     }
   }

@@ -42,6 +42,13 @@ export const checkout = async ({
   paymentMethodId,
   cartItems,
 }) => {
+  // 🔥 Debug payload antes de enviar
+  console.log('🛒 CHECKOUT PAYLOAD');
+  console.log('shippingAddressId:', shippingAddressId);
+  console.log('paymentMethodId:', paymentMethodId);
+  console.log('cartItems:', cartItems);
+  console.table(cartItems);
+
   return apiFetch('/api/payments/checkout', {
     method: 'POST',
     body: JSON.stringify({

@@ -515,49 +515,64 @@ class PaymentController {
   }
 
   static async getOrderById(req, res) {
-    const userId = req.userId;
-    const { id } = req.params;
+  const userId = req.userId;
+  const { id } = req.params;
 
-    try {
-      const order = await db('orders')
-        .where({
-          id,
-          user_id: userId,
-        })
-        .first();
+  try {
+    const order = await db('orders')
+      .where({
+        id,
+        user_id: userId,
+      })
+      .first();
 
-      if (!order) {
-        return res.status(404).json({
-          error:
-            'Orden no encontrada',
-        });
-      }
-
-      const items = await db(
-        'order_items'
-      ).where({
-        order_id: id,
-      });
-
-      return res.json({
-        ...order,
-        items,
-      });
-    } catch (error) {
-      PaymentController.logError(
-        'GET ORDER BY ID',
-        error,
-        {
-          userId,
-          id,
-        }
-      );
-
-      return res.status(500).json({
-        error: error.message,
+    if (!order) {
+      return res.status(404).json({
+        error: 'Orden no encontrada',
       });
     }
+
+    const items = await db('order_items as oi')
+      .leftJoin(
+        'product_images as pi',
+        'oi.product_id',
+        'pi.product_id'
+      )
+      .select(
+        'oi.id',
+        'oi.order_id',
+        'oi.product_id',
+        'oi.name',
+        'oi.price',
+        'oi.quantity',
+        'oi.size',
+        'oi.color',
+        'pi.image_url as image'
+      )
+      .where({
+        'oi.order_id': id
+      });
+
+    console.log('🔥 ITEMS CON IMAGENES');
+    console.log(items);
+
+    return res.json({
+      ...order,
+      items
+    });
+
+  } catch (error) {
+    PaymentController.logError(
+      'GET ORDER BY ID',
+      error,
+      { userId, id }
+    );
+
+    return res.status(500).json({
+      error: error.message
+    });
   }
+}
 }
 
 module.exports = PaymentController;

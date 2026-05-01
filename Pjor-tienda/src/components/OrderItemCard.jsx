@@ -1,6 +1,7 @@
 import React from 'react'
+import './styles/OrderItemCard.scss'
 
-const OrderItemCard = () => {
+const OrderItemCard = ({item}) => {
     return (
         <div className="order-item-card">
             <img src={item.image} />

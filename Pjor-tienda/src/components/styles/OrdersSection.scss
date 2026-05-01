@@ -3,8 +3,7 @@
 }
 
 .order-section__arrow {
-  position: absolute;
-  top: 20px;
+  position: relative;
   background: none;
   border: none;
   font-size: 28px;
@@ -17,6 +16,31 @@
 
 .right {
   right: 10px;
+}
+
+.order-section__header{
+  margin-top: 3%;
+  border: 2px solid black;
+  font-family: Permanent Marker;
+  color: black;
+  display: flex;
+
+  &-date-wrapper{
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+  h2{
+    margin: auto;
+    
+  }
+  label{
+    margin: auto;
+   
+  }
+  
 }
 
 .orders-section__empty{

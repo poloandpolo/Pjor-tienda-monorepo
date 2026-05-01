@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import './styles/AccountModal.scss';
 import { ProfileInfo } from './ProfileInfo';
-import { loginUser, registerUser, updateUserPassword } from '../services/authService';
+import OrdersSection from './OrdersSection';
+import {
+  loginUser,
+  registerUser,
+  updateUserPassword
+} from '../services/authService';
 
-// 🔥 AUTH CONTEXT
 import { useAuth } from '../context/authContext';
 
 export const AccountModal = ({ isVisible, onClose }) => {
-
-  // ========================
-  // 🔐 AUTH CONTEXT
-  // ========================
   const { user, isAuthenticated, login, logout } = useAuth();
 
   // ========================
@@ -20,6 +20,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
 
   const [tempValues, setTempValues] = useState({});
 
@@ -30,28 +31,41 @@ export const AccountModal = ({ isVisible, onClose }) => {
     password: false,
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm();
 
   // ========================
   // UI HEIGHT CONTROL
   // ========================
   useEffect(() => {
-
-    const contentElement = document.querySelector('.account-modal__content');
+    const contentElement = document.querySelector(
+      '.account-modal__content'
+    );
 
     if (contentElement) {
-
       const getHeight = () => {
+        if (showOrders) return '90vh';
+        if (showProfile) return '90vh';
         if (isSignUp) return '80vh';
         if (isAuthenticated) return '90vh';
-        if (showProfile) return '80vh';
+
         return '60vh';
       };
 
-      contentElement.style.setProperty('--content-height', getHeight());
+      contentElement.style.setProperty(
+        '--content-height',
+        getHeight()
+      );
     }
-
-  }, [isSignUp, isAuthenticated, showProfile]);
+  }, [
+    isSignUp,
+    isAuthenticated,
+    showProfile,
+    showOrders
+  ]);
 
   // ========================
   // LOGIN
@@ -60,9 +74,11 @@ export const AccountModal = ({ isVisible, onClose }) => {
     try {
       const result = await loginUser(data);
 
-      if (!result?.token) throw new Error('Token missing');
+      if (!result?.token) {
+        throw new Error('Token missing');
+      }
 
-      login(result.token); // 🔥 AUTH CONTEXT
+      login(result.token);
 
       setIsSignUp(false);
       setIsForgotPassword(false);
@@ -73,7 +89,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
   };
 
   // ========================
-  // REGISTER + AUTO LOGIN
+  // REGISTER
   // ========================
   const handleRegister = async (data) => {
     try {
@@ -84,14 +100,14 @@ export const AccountModal = ({ isVisible, onClose }) => {
         password: data.password
       });
 
-      if (!loginResult?.token) throw new Error('Token missing');
+      if (!loginResult?.token) {
+        throw new Error('Token missing');
+      }
 
-      login(loginResult.token); // 🔥 AUTH CONTEXT
+      login(loginResult.token);
 
       setIsSignUp(false);
       setIsForgotPassword(false);
-
-      console.log('Usuario registrado y logueado');
 
     } catch (error) {
       console.error('Register error:', error);
@@ -99,7 +115,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
   };
 
   // ========================
-  // PASSWORD UPDATE
+  // PASSWORD
   // ========================
   const updatePassword = async (newPassword) => {
     try {
@@ -116,15 +132,16 @@ export const AccountModal = ({ isVisible, onClose }) => {
   // LOGOUT
   // ========================
   const handleLogoutClick = () => {
-    logout(); // 🔥 AUTH CONTEXT
+    logout();
 
     setShowProfile(false);
+    setShowOrders(false);
     setIsSignUp(false);
     setIsForgotPassword(false);
   };
 
   // ========================
-  // UI HANDLERS
+  // NAVIGATION
   // ========================
   const handleForgotPasswordClick = () => {
     setIsForgotPassword(true);
@@ -143,12 +160,22 @@ export const AccountModal = ({ isVisible, onClose }) => {
 
   const handleViewProfileClick = () => {
     setShowProfile(true);
+    setShowOrders(false);
+  };
+
+  const handleViewOrdersClick = () => {
+    setShowOrders(true);
+    setShowProfile(false);
   };
 
   const handleBackToMenuClick = () => {
     setShowProfile(false);
+    setShowOrders(false);
   };
 
+  // ========================
+  // PROFILE EDIT
+  // ========================
   const handleEditClick = (field) => {
     setEditingFields((prev) => ({
       ...prev,
@@ -159,7 +186,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
   const handleFieldChange = (field, value) => {
     setTempValues((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -170,14 +197,14 @@ export const AccountModal = ({ isVisible, onClose }) => {
 
     setEditingFields((prev) => ({
       ...prev,
-      [field]: false
+      [field]: false,
     }));
   };
 
   const handleCancelClick = (field) => {
     setEditingFields((prev) => ({
       ...prev,
-      [field]: false
+      [field]: false,
     }));
   };
 
@@ -185,25 +212,28 @@ export const AccountModal = ({ isVisible, onClose }) => {
   // RENDER
   // ========================
   return (
-    <div className={`account-modal__overlay ${isVisible ? 'show' : ''}`}>
+    <div
+      className={`account-modal__overlay ${
+        isVisible ? 'show' : ''
+      }`}
+    >
+      <div className="account-modal__content">
 
-      <div className='account-modal__content'>
-
-        <div className='account-modal__close-wrapper'>
-          <button className='account-modal__close-button' onClick={onClose}>
+        <div className="account-modal__close-wrapper">
+          <button
+            className="account-modal__close-button"
+            onClick={onClose}
+          >
             X
           </button>
         </div>
 
-        {/* ========================
-            LOGGED IN
-        ======================== */}
         {isAuthenticated ? (
 
           showProfile ? (
 
             <>
-              <div className='account-modal__title'>
+              <div className="account-modal__title">
                 <h2>Tu perfil</h2>
               </div>
 
@@ -218,21 +248,46 @@ export const AccountModal = ({ isVisible, onClose }) => {
               />
             </>
 
+          ) : showOrders ? (
+
+            <>
+              <div className="account-modal__title">
+                <h2>Tus pedidos</h2>
+              </div>
+
+              <OrdersSection />
+
+              <button
+                onClick={handleBackToMenuClick}
+              >
+                Volver
+              </button>
+            </>
+
           ) : (
 
             <>
-              <div className='account-modal__title'>
-                <h2>Bienvenido, {user?.first_name || 'Usuario'}</h2>
+              <div className="account-modal__title">
+                <h2>
+                  Bienvenido,{' '}
+                  {user?.first_name || 'Usuario'}
+                </h2>
               </div>
 
-              <div className='account-modal__menu'>
-                <h2 onClick={handleViewProfileClick}>Tu perfil</h2>
-                <h2>Tus pedidos</h2>
+              <div className="account-modal__menu">
+                <h2 onClick={handleViewProfileClick}>
+                  Tu perfil
+                </h2>
+
+                <h2 onClick={handleViewOrdersClick}>
+                  Tus pedidos
+                </h2>
+
                 <h2>Promociones</h2>
                 <h2>Direcciones y pagos</h2>
 
                 <button
-                  className='account-modal__log-out-button'
+                  className="account-modal__log-out-button"
                   onClick={handleLogoutClick}
                 >
                   Cerrar sesión
@@ -245,14 +300,23 @@ export const AccountModal = ({ isVisible, onClose }) => {
         ) : isForgotPassword ? (
 
           <>
-            <div className='account-modal__title'>
+            <div className="account-modal__title">
               <h2>Recupera tu contraseña</h2>
             </div>
 
-            <div className='account-modal__input-wrapper'>
-              <input placeholder='Email' type='email' />
-              <button>Enviar correo</button>
-              <label onClick={handleBackToLoginClick}>
+            <div className="account-modal__input-wrapper">
+              <input
+                placeholder="Email"
+                type="email"
+              />
+
+              <button>
+                Enviar correo
+              </button>
+
+              <label
+                onClick={handleBackToLoginClick}
+              >
                 Volver a iniciar sesión
               </label>
             </div>
@@ -261,7 +325,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
         ) : isSignUp ? (
 
           <>
-            <div className='account-modal__title'>
+            <div className="account-modal__title">
               <h2>Crea tu cuenta</h2>
             </div>
 
@@ -269,77 +333,105 @@ export const AccountModal = ({ isVisible, onClose }) => {
               onSubmit={handleSubmit(handleRegister)}
               className="account-modal__input-wrapper"
             >
-
               <input
-                placeholder='Nombre'
-                {...register('firstName', { required: true })}
+                placeholder="Nombre"
+                {...register(
+                  'firstName',
+                  { required: true }
+                )}
               />
+
               {errors.firstName && <p>Error</p>}
 
               <input
-                placeholder='Apellido'
-                {...register('lastName', { required: true })}
+                placeholder="Apellido"
+                {...register(
+                  'lastName',
+                  { required: true }
+                )}
               />
 
               <input
-                placeholder='Email'
-                {...register('email', { required: true })}
+                placeholder="Email"
+                {...register(
+                  'email',
+                  { required: true }
+                )}
               />
 
               <input
-                placeholder='Contraseña'
-                type='password'
-                {...register('password', { required: true })}
+                placeholder="Contraseña"
+                type="password"
+                {...register(
+                  'password',
+                  { required: true }
+                )}
               />
 
-              <button type="submit">Registrar</button>
+              <button type="submit">
+                Registrar
+              </button>
 
-              <label onClick={handleBackToLoginClick}>
+              <label
+                onClick={handleBackToLoginClick}
+              >
                 Volver a iniciar sesión
               </label>
-
             </form>
           </>
 
         ) : (
 
           <>
-            <div className='account-modal__title'>
+            <div className="account-modal__title">
               <h2>Entra a tu cuenta</h2>
             </div>
 
-            <div className='account-modal__input-wrapper'>
-
+            <div className="account-modal__input-wrapper">
               <input
-                placeholder='Email'
-                {...register('email', { required: true })}
+                placeholder="Email"
+                {...register(
+                  'email',
+                  { required: true }
+                )}
               />
 
               <input
-                placeholder='Contraseña'
-                type='password'
-                {...register('password', { required: true })}
+                placeholder="Contraseña"
+                type="password"
+                {...register(
+                  'password',
+                  { required: true }
+                )}
               />
 
-              <button onClick={handleSubmit(handleLoginClick)}>
+              <button
+                onClick={handleSubmit(
+                  handleLoginClick
+                )}
+              >
                 Entrar
               </button>
 
-              <label onClick={handleForgotPasswordClick}>
+              <label
+                onClick={
+                  handleForgotPasswordClick
+                }
+              >
                 ¿Olvidaste contraseña?
               </label>
 
-              <label onClick={handleSignUpClick}>
+              <label
+                onClick={handleSignUpClick}
+              >
                 Crear cuenta
               </label>
-
             </div>
           </>
 
         )}
 
       </div>
-
     </div>
   );
 };

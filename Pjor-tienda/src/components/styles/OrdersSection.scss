@@ -1,0 +1,31 @@
+.order-section {
+  position: relative;
+}
+
+.order-section__arrow {
+  position: absolute;
+  top: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.left {
+  left: 10px;
+}
+
+.right {
+  right: 10px;
+}
+
+.orders-section__empty{
+    display: flex;
+    height: 35vw;
+
+    h2{
+        justify-content: center;
+        text-align: center;
+        margin: auto;
+    }
+}

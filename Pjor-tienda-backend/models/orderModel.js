@@ -27,13 +27,36 @@ const OrderModel = {
 
   async getOrderById(userId, orderId) {
     return knex('orders')
-      .where({ id: orderId, user_id: userId })
+      .where({
+        id: orderId,
+        user_id: userId
+      })
       .first();
   },
 
   async getOrderItems(orderId) {
-    return knex('order_items')
-      .where({ order_id: orderId });
+    return knex('order_items as oi')
+      .leftJoin(
+        'product_images as pi',
+        'oi.product_id',
+        'pi.product_id'
+      )
+      .select(
+        'oi.*',
+        knex.raw(`
+          COALESCE(
+            json_agg(pi.image_url)
+            FILTER (
+              WHERE pi.image_url IS NOT NULL
+            ),
+            '[]'
+          ) as images
+        `)
+      )
+      .where({
+        'oi.order_id': orderId
+      })
+      .groupBy('oi.id');
   },
 
   async getOrderAddress(orderId) {

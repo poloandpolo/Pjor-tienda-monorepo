@@ -89,27 +89,45 @@ const OrderController = {
   },
 
   async getOrderById(req, res) {
-    try {
-      const order = await OrderModel.getOrderById(req.userId, req.params.id);
+  try {
+    const order = await OrderModel.getOrderById(
+      req.userId,
+      req.params.id
+    );
 
-      if (!order) {
-        return res.status(404).json({ message: 'Orden no encontrada' });
-      }
-
-      const items = await OrderModel.getOrderItems(req.params.id);
-      const address = await OrderModel.getOrderAddress(req.params.id);
-
-      return res.json({
-        ...order,
-        items,
-        address
+    if (!order) {
+      return res.status(404).json({
+        message: 'Orden no encontrada'
       });
-
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Error obteniendo orden' });
     }
+
+    const items = await OrderModel.getOrderItems(
+      req.params.id
+    );
+
+    const address = await OrderModel.getOrderAddress(
+      req.params.id
+    );
+
+    console.log('🟢 ORDER ITEMS BACKEND:');
+    console.log(
+      JSON.stringify(items, null, 2)
+    );
+
+    return res.json({
+      ...order,
+      items,
+      address
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: 'Error obteniendo orden'
+    });
   }
+}
 
 };
 

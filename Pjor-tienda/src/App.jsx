@@ -1,5 +1,11 @@
+// App.jsx
+
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Route,
+  Routes
+} from 'react-router-dom';
 
 import { MenPage } from './pages/MenPage';
 import { LandingPage } from './pages/LandingPage';
@@ -8,10 +14,9 @@ import { WomenPage } from './pages/WomenPage';
 import { VisionPage } from './pages/VisionPage';
 import { CrewPage } from './pages/CrewPage';
 import CheckoutPage from './pages/CheckoutPage';
+import { WakingupPage } from './pages/WakingupPage';
 
 import { MenPageContextProvider } from './context/MenPageContext';
-
-// 🔥 AUTH IMPORT
 import { AuthProvider } from './context/authContext';
 
 import "slick-carousel/slick/slick.css";
@@ -19,39 +24,70 @@ import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   return (
-    <div className='body'>
+    <div className="body">
 
-      {/* 🔥 AUTH GLOBAL WRAPPER */}
       <AuthProvider>
 
         <BrowserRouter>
+
           <Routes>
 
-            <Route path='/' element={<LandingPage />} />
+            {/* PRE LANDING */}
+            <Route
+              path="/"
+              element={<WakingupPage />}
+            />
 
-            <Route path='hombre' element={
-              <MenPageContextProvider>
-                <MenPage />
-              </MenPageContextProvider>
-            } />
+            {/* LANDING REAL */}
+            <Route
+              path="/landing"
+              element={<LandingPage />}
+            />
 
-            <Route path='mujer' element={
-              <MenPageContextProvider>
-                <WomenPage />
-              </MenPageContextProvider>
-            } />
+            <Route
+              path="/hombre"
+              element={
+                <MenPageContextProvider>
+                  <MenPage />
+                </MenPageContextProvider>
+              }
+            />
 
-            <Route path='media' element={<MediaPage />} />
-            <Route path='crew' element={<CrewPage />} />
-            <Route path='vision' element={<VisionPage />} />
+            <Route
+              path="/mujer"
+              element={
+                <MenPageContextProvider>
+                  <WomenPage />
+                </MenPageContextProvider>
+              }
+            />
 
-            <Route path='checkout' element={
-              <MenPageContextProvider>
-                <CheckoutPage />
-              </MenPageContextProvider>
-            } />
+            <Route
+              path="/media"
+              element={<MediaPage />}
+            />
+
+            <Route
+              path="/crew"
+              element={<CrewPage />}
+            />
+
+            <Route
+              path="/vision"
+              element={<VisionPage />}
+            />
+
+            <Route
+              path="/checkout"
+              element={
+                <MenPageContextProvider>
+                  <CheckoutPage />
+                </MenPageContextProvider>
+              }
+            />
 
           </Routes>
+
         </BrowserRouter>
 
       </AuthProvider>

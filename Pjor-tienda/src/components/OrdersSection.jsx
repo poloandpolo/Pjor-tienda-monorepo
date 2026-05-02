@@ -9,8 +9,6 @@ import {
   getOrderById
 } from '../services/orderService';
 
-// IMPORTANTE:
-// npm install react-slick slick-carousel
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -25,7 +23,7 @@ const OrdersSection = () => {
   const [error, setError] = useState('');
 
   // =====================================
-  // 🔥 LOAD ORDERS
+  // LOAD ORDERS
   // =====================================
   useEffect(() => {
     fetchOrders();
@@ -53,7 +51,7 @@ const OrdersSection = () => {
   };
 
   // =====================================
-  // 🔥 LOAD ORDER DETAIL
+  // LOAD ORDER DETAIL
   // =====================================
   const fetchOrderDetail = async (orderId) => {
     try {
@@ -72,7 +70,7 @@ const OrdersSection = () => {
   };
 
   // =====================================
-  // 🔥 ORDER NAVIGATION
+  // ORDER NAVIGATION
   // =====================================
   const nextOrder = async () => {
     if (currentOrderIndex < orders.length - 1) {
@@ -99,13 +97,12 @@ const OrdersSection = () => {
   };
 
   // =====================================
-  // 🔥 SLICK SETTINGS
+  // SLICK SETTINGS
   // =====================================
   const sliderSettings = {
     dots: false,
     arrows: true,
-    infinite:
-      false,
+    infinite: false,
     speed: 400,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -114,7 +111,7 @@ const OrdersSection = () => {
   };
 
   // =====================================
-  // 🔥 STATES
+  // STATES
   // =====================================
   if (loadingOrders) {
     return (
@@ -149,7 +146,43 @@ const OrdersSection = () => {
   }
 
   // =====================================
-  // 🔥 RENDER
+  // GROUP ITEMS (name + color + size)
+  // =====================================
+  const groupedItems = currentOrder.items?.reduce(
+    (acc, item) => {
+      const colorKey =
+        typeof item.color === 'object'
+          ? JSON.stringify(item.color)
+          : item.color || '';
+
+      const sizeKey = item.size || '';
+
+      const groupKey = `${item.name}-${colorKey}-${sizeKey}`;
+
+      const existingItem = acc.find(
+        (product) =>
+          product._groupKey === groupKey
+      );
+
+      if (existingItem) {
+        existingItem.quantity += Number(
+          item.quantity
+        );
+      } else {
+        acc.push({
+          ...item,
+          quantity: Number(item.quantity),
+          _groupKey: groupKey
+        });
+      }
+
+      return acc;
+    },
+    []
+  );
+
+  // =====================================
+  // RENDER
   // =====================================
   return (
     <div className="order-section">
@@ -192,15 +225,11 @@ const OrdersSection = () => {
       <div className="order-section__items-wrapper">
 
         <Slider {...sliderSettings}>
-          {currentOrder.items?.map(
-            (item) => (
-              <div key={item.id}>
-                <OrderItemCard
-                  item={item}
-                />
-              </div>
-            )
-          )}
+          {groupedItems?.map((item) => (
+            <div key={item._groupKey}>
+              <OrderItemCard item={item} />
+            </div>
+          ))}
         </Slider>
 
       </div>
@@ -212,10 +241,7 @@ const OrdersSection = () => {
             currentOrder.total_amount
           ).toFixed(2)}
         </h3>
-
       </div>
-
-
 
     </div>
   );

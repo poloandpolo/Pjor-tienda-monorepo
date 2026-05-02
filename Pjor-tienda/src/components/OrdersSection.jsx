@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Slider from 'react-slick';
+
 import './styles/OrdersSection.scss';
 import OrderItemCard from './OrderItemCard';
 
@@ -7,10 +9,14 @@ import {
   getOrderById
 } from '../services/orderService';
 
+// IMPORTANTE:
+// npm install react-slick slick-carousel
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
 const OrdersSection = () => {
   const [orders, setOrders] = useState([]);
   const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
-
   const [currentOrder, setCurrentOrder] = useState(null);
 
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -19,7 +25,7 @@ const OrdersSection = () => {
   const [error, setError] = useState('');
 
   // =====================================
-  // 🔥 CARGAR ÓRDENES AL MONTAR
+  // 🔥 LOAD ORDERS
   // =====================================
   useEffect(() => {
     fetchOrders();
@@ -47,7 +53,7 @@ const OrdersSection = () => {
   };
 
   // =====================================
-  // 🔥 CARGAR DETALLE ORDEN
+  // 🔥 LOAD ORDER DETAIL
   // =====================================
   const fetchOrderDetail = async (orderId) => {
     try {
@@ -66,7 +72,7 @@ const OrdersSection = () => {
   };
 
   // =====================================
-  // 🔥 NAVEGACIÓN
+  // 🔥 ORDER NAVIGATION
   // =====================================
   const nextOrder = async () => {
     if (currentOrderIndex < orders.length - 1) {
@@ -90,6 +96,21 @@ const OrdersSection = () => {
         orders[newIndex].id
       );
     }
+  };
+
+  // =====================================
+  // 🔥 SLICK SETTINGS
+  // =====================================
+  const sliderSettings = {
+    dots: false,
+    arrows: true,
+    infinite:
+      false,
+    speed: 400,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    swipe: true,
+    adaptiveHeight: true
   };
 
   // =====================================
@@ -133,60 +154,68 @@ const OrdersSection = () => {
   return (
     <div className="order-section">
 
-        <div className="order-section__header">
+      <div className="order-section__header">
 
         <button
-        className="order-section__arrow left"
-        onClick={prevOrder}
-        disabled={currentOrderIndex === 0}
-      >
-        ←
-      </button>
+          className="order-section__arrow left"
+          onClick={prevOrder}
+          disabled={currentOrderIndex === 0}
+        >
+          ←
+        </button>
 
-      <div className='order-section__header-date-wrapper'>
-        <h2>
-        PEDIDO #{currentOrder.id}         
-      </h2>
+        <div className="order-section__header-date-wrapper">
+          <h2>
+            PEDIDO #{currentOrder.id}
+          </h2>
 
-       <label>
-        {new Date(
-          currentOrder.created_at
-        ).toLocaleDateString()}
-      </label>
-
-      </div>
-
-       
-
-
-
-      <button
-        className="order-section__arrow right"
-        onClick={nextOrder}
-        disabled={
-          currentOrderIndex === orders.length - 1
-        }
-      >
-        →
-      </button>
-
+          <label>
+            {new Date(
+              currentOrder.created_at
+            ).toLocaleDateString()}
+          </label>
         </div>
 
-      <div className="order-section__items-wrapper">
-        {currentOrder.items?.map((item, index) => (
-          <OrderItemCard
-            key={index}
-            item={item}
-          />
-        ))}
+        <button
+          className="order-section__arrow right"
+          onClick={nextOrder}
+          disabled={
+            currentOrderIndex ===
+            orders.length - 1
+          }
+        >
+          →
+        </button>
+
       </div>
 
-      <h3>
-        TOTAL $
-        {Number(
-          currentOrder.total_amount
-        ).toFixed(2)}
-      </h3>
+      <div className="order-section__items-wrapper">
+
+        <Slider {...sliderSettings}>
+          {currentOrder.items?.map(
+            (item) => (
+              <div key={item.id}>
+                <OrderItemCard
+                  item={item}
+                />
+              </div>
+            )
+          )}
+        </Slider>
+
+      </div>
+
+      <div className="order-section__bottom-wrapper">
+        <h3>
+          TOTAL $
+          {Number(
+            currentOrder.total_amount
+          ).toFixed(2)}
+        </h3>
+
+      </div>
+
+
 
     </div>
   );

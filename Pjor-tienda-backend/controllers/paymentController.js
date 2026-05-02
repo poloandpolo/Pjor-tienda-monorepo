@@ -514,7 +514,7 @@ class PaymentController {
     }
   }
 
-  static async getOrderById(req, res) {
+ static async getOrderById(req, res) {
   const userId = req.userId;
   const { id } = req.params;
 
@@ -534,7 +534,18 @@ class PaymentController {
 
     const items = await db('order_items as oi')
       .leftJoin(
-        'product_images as pi',
+        db('product_images as pi')
+          .select(
+            'product_id',
+            'image_url'
+          )
+          .whereIn(
+            'id',
+            db('product_images')
+              .select(db.raw('MIN(id)'))
+              .groupBy('product_id')
+          )
+          .as('pi'),
         'oi.product_id',
         'pi.product_id'
       )
@@ -550,15 +561,30 @@ class PaymentController {
         'pi.image_url as image'
       )
       .where({
-        'oi.order_id': id
-      });
+        'oi.order_id': id,
+      })
+      .orderBy('oi.id', 'asc');
 
-    console.log('🔥 ITEMS CON IMAGENES');
-    console.log(items);
+    const formattedItems = items.map((item) => {
+      let parsedColor = null;
+
+      try {
+        parsedColor = item.color
+          ? JSON.parse(item.color)
+          : null;
+      } catch (_) {
+        parsedColor = item.color;
+      }
+
+      return {
+        ...item,
+        color: parsedColor,
+      };
+    });
 
     return res.json({
       ...order,
-      items
+      items: formattedItems,
     });
 
   } catch (error) {
@@ -569,7 +595,7 @@ class PaymentController {
     );
 
     return res.status(500).json({
-      error: error.message
+      error: error.message,
     });
   }
 }

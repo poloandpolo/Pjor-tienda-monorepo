@@ -1,6 +1,42 @@
-.order-item-card{
-    img{
-        height: 10%;
-        width: 10%;
+.order-item-card {
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    height: 25vw;
+    transform: translateY(10%);
+
+
+    &__details-wrapper {
+        font-size: 18px;
+        font-family: Permanent Marker;
+        color: black;
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        text-align: center;
+        justify-content: center;
+        transform: translateY(-22%);
+
+        &__color-wrapper{
+            display: flex;
+           
+           justify-content: center;
+            
+
+        }
     }
+
+    &__product-image {
+        height: 80%;
+        width: 80%;
+        object-fit: contain;
+    }
+
+    &__color-image {
+        height: 20px;
+        width: 20px;
+        border: 2px solid black;
+        border-radius: 100%;
+    }
+
 }

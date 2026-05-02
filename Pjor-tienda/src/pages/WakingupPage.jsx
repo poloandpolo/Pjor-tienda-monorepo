@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/WakingupPage.scss';
+
 
 export const WakingupPage = () => {
   const navigate = useNavigate();

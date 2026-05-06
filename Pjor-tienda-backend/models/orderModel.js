@@ -1,14 +1,13 @@
-const knexConfig = require('../knexfile');
-const knex = require('knex')(knexConfig.development);
+const db = require('../db/db'); // ✅ única conexión
 
 const OrderModel = {
 
   async createOrder(trx, orderData) {
     const result = await trx('orders')
       .insert(orderData)
-      .returning('id');
+      .returning('*');
 
-    return result[0].id;
+    return result[0];
   },
 
   async createOrderItems(trx, items) {
@@ -16,13 +15,13 @@ const OrderModel = {
   },
 
   async getUserOrders(userId) {
-    return knex('orders')
+    return db('orders')
       .where({ user_id: userId })
       .orderBy('created_at', 'desc');
   },
 
   async getOrderById(userId, orderId) {
-    return knex('orders')
+    return db('orders')
       .where({
         id: orderId,
         user_id: userId
@@ -31,7 +30,7 @@ const OrderModel = {
   },
 
   async getOrderItems(orderId) {
-    return knex('order_items as oi')
+    return db('order_items as oi')
       .leftJoin(
         'product_images as pi',
         'oi.product_id',
@@ -39,7 +38,7 @@ const OrderModel = {
       )
       .select(
         'oi.*',
-        knex.raw(`
+        db.raw(`
           COALESCE(
             json_agg(pi.image_url)
             FILTER (WHERE pi.image_url IS NOT NULL),
@@ -54,13 +53,13 @@ const OrderModel = {
   },
 
   async getAddressById(addressId) {
-    return knex('addresses')
+    return db('addresses')
       .where({ id: addressId })
       .first();
   },
 
   async getPaymentMethodById(paymentMethodId) {
-    return knex('payment_methods')
+    return db('payment_methods')
       .where({ id: paymentMethodId })
       .first();
   }

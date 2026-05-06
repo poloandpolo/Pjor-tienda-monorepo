@@ -1,4 +1,4 @@
-const db = require('../db/db'); // ✅ único punto de conexión
+const db = require('../db/db');
 const OrderModel = require('../models/orderModel');
 
 const OrderController = {
@@ -18,7 +18,7 @@ const OrderController = {
     }
 
     try {
-      const order = await db.transaction(async (trx) => { // 🔥 aquí
+      const order = await db.transaction(async (trx) => {
 
         let subtotal = 0;
 
@@ -77,7 +77,74 @@ const OrderController = {
     }
   },
 
-  // ... lo demás igual
+  async getUserOrders(req, res) {
+    try {
+      const orders = await OrderModel.getUserOrders(req.userId);
+      return res.json(orders);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: 'Error obteniendo órdenes'
+      });
+    }
+  },
+
+  async getOrderById(req, res) {
+    try {
+      const order = await OrderModel.getOrderById(
+        req.userId,
+        req.params.id
+      );
+
+      if (!order) {
+        return res.status(404).json({
+          message: 'Orden no encontrada'
+        });
+      }
+
+      const rawItems = await OrderModel.getOrderItems(order.id);
+
+      const items = rawItems.map(item => {
+        let parsedColor = null;
+
+        try {
+          parsedColor = item.color
+            ? JSON.parse(item.color)
+            : null;
+        } catch (e) {
+          parsedColor = item.color; // fallback
+        }
+
+        return {
+          ...item,
+          color: parsedColor
+        };
+      });
+
+      const address = await OrderModel.getAddressById(
+        order.shipping_address_id
+      );
+
+      const payment_method = await OrderModel.getPaymentMethodById(
+        order.payment_method_id
+      );
+
+      return res.json({
+        ...order,
+        items,
+        address,
+        payment_method
+      });
+
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: 'Error obteniendo orden'
+      });
+    }
+  }
+
 };
 
 module.exports = OrderController;

@@ -15,10 +15,6 @@ const OrderModel = {
     return trx('order_items').insert(items);
   },
 
-  async createOrderAddress(trx, address) {
-    return trx('order_addresses').insert(address);
-  },
-
   async getUserOrders(userId) {
     return knex('orders')
       .where({ user_id: userId })
@@ -46,9 +42,7 @@ const OrderModel = {
         knex.raw(`
           COALESCE(
             json_agg(pi.image_url)
-            FILTER (
-              WHERE pi.image_url IS NOT NULL
-            ),
+            FILTER (WHERE pi.image_url IS NOT NULL),
             '[]'
           ) as images
         `)
@@ -59,9 +53,15 @@ const OrderModel = {
       .groupBy('oi.id');
   },
 
-  async getOrderAddress(orderId) {
-    return knex('order_addresses')
-      .where({ order_id: orderId })
+  async getAddressById(addressId) {
+    return knex('addresses')
+      .where({ id: addressId })
+      .first();
+  },
+
+  async getPaymentMethodById(paymentMethodId) {
+    return knex('payment_methods')
+      .where({ id: paymentMethodId })
       .first();
   }
 

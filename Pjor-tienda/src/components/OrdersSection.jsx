@@ -12,7 +12,7 @@ import {
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-const OrdersSection = () => {
+const OrdersSection = ({ onBack }) => {
   const [orders, setOrders] = useState([]);
   const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
   const [currentOrder, setCurrentOrder] = useState(null);
@@ -36,6 +36,7 @@ const OrdersSection = () => {
 
       const data = await getUserOrders();
 
+
       setOrders(data || []);
 
       if (data?.length) {
@@ -58,7 +59,7 @@ const OrdersSection = () => {
       setLoadingOrderDetail(true);
 
       const data = await getOrderById(orderId);
-
+      
       setCurrentOrder(data);
 
     } catch (err) {
@@ -81,6 +82,7 @@ const OrdersSection = () => {
       await fetchOrderDetail(
         orders[newIndex].id
       );
+
     }
   };
 
@@ -234,6 +236,42 @@ const OrdersSection = () => {
 
       </div>
 
+      <div className="order-section__address-wrapper">
+        <h2>
+          Direccion de Entrega.
+        </h2>
+          <p>
+            {currentOrder.address.address}
+          </p>
+          <p>
+            {currentOrder.address.city}
+          </p>
+          <p>
+            {currentOrder.address.state}
+          </p>
+          <p>
+            CP: {currentOrder.address.postal_code}
+          </p>
+          
+          <p>
+            TEL: {currentOrder.address.phone}
+          </p>
+      </div>
+
+      <div className="order-section__payment-wrapper">
+        <h2>
+          Método de pago.
+        </h2>
+          <p>
+            {currentOrder.payment_method.brand} {currentOrder.payment_method.last4}
+          </p>
+          <p>
+            {currentOrder.payment_method.exp_month}/
+            {currentOrder.payment_method.exp_year}
+          </p>
+         
+      </div>
+
       <div className="order-section__bottom-wrapper">
         <h3>
           TOTAL $
@@ -241,6 +279,10 @@ const OrdersSection = () => {
             currentOrder.total_amount
           ).toFixed(2)}
         </h3>
+
+        <button onClick={onBack}>
+          Volver
+        </button>
       </div>
 
     </div>

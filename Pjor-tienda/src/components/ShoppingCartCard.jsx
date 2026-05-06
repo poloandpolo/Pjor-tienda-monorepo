@@ -28,7 +28,7 @@ export const ShoppingCartCard = ({ item }) => {
                         <div className="shopping-cart-card__color-container">
                             <label>Color: </label>
                             {item.color && (
-                                <img src={item.color} alt="Selected color" className="shopping-cart-card__color-thumbnail" />
+                                <img src={item.color.image} alt="Selected color" className="shopping-cart-card__color-thumbnail" />
                             )}
                         </div>
                         <div className="shopping-cart-card__size-container">

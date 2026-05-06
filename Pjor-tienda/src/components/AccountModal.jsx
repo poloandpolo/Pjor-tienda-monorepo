@@ -255,13 +255,8 @@ export const AccountModal = ({ isVisible, onClose }) => {
                 <h2>Tus pedidos</h2>
               </div>
 
-              <OrdersSection />
+              <OrdersSection onBack={handleBackToMenuClick} />
 
-              <button
-                onClick={handleBackToMenuClick}
-              >
-                Volver
-              </button>
             </>
 
           ) : (

@@ -6,70 +6,70 @@ const OrderController = {
 
   async createOrder(req, res) {
     const userId = req.userId;
-    const { items, address, shipping_cost = 0, taxes = 0 } = req.body;
+    const { items, shipping_address_id, payment_method_id } = req.body;
 
-    if (!items || !Array.isArray(items) || !items.length) {
+    if (!items?.length) {
       return res.status(400).json({ message: 'Cart vacío' });
     }
 
-    if (!address) {
-      return res.status(400).json({ message: 'Dirección requerida' });
+    if (!shipping_address_id || !payment_method_id) {
+      return res.status(400).json({
+        message: 'Faltan datos de dirección o pago'
+      });
     }
 
     try {
-      const orderId = await knex.transaction(async (trx) => {
+      const order = await knex.transaction(async (trx) => {
 
-        const subtotal = items.reduce((acc, item) => {
-          return acc + (item.price * item.quantity);
-        }, 0);
+        let subtotal = 0;
 
-        const total_amount = subtotal + shipping_cost + taxes;
+        const itemsPrepared = items.map(item => {
+          const price = Number(item.price);
+          const quantity = Number(item.quantity);
 
-        const orderData = {
+          subtotal += price * quantity;
+
+          return {
+            product_id: item.product_id,
+            name: item.name,
+            price,
+            quantity,
+            size: item.size || null,
+            color: item.color || null
+          };
+        });
+
+        const total = subtotal;
+
+        const newOrder = await OrderModel.createOrder(trx, {
           user_id: userId,
+          shipping_address_id,
+          payment_method_id,
           status: 'pending',
           subtotal,
-          shipping_cost,
-          taxes,
-          total_amount,
+          shipping_cost: 0,
+          taxes: 0,
+          total_amount: total,
           currency: 'mxn'
-        };
+        });
 
-        const newOrderId = await OrderModel.createOrder(trx, orderData);
-
-        const orderItems = items.map(item => ({
-          order_id: newOrderId,
-          product_id: item.product_id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size || null,
-          color: item.color || null
+        const orderItems = itemsPrepared.map(item => ({
+          order_id: newOrder.id,
+          ...item
         }));
 
         await OrderModel.createOrderItems(trx, orderItems);
 
-        await OrderModel.createOrderAddress(trx, {
-          order_id: newOrderId,
-          first_name: address.first_name,
-          last_name: address.last_name,
-          address: address.address,
-          city: address.city,
-          state: address.state,
-          postal_code: address.postal_code,
-          phone: address.phone
-        });
-
-        return newOrderId;
+        return newOrder;
       });
 
       return res.status(201).json({
         message: 'Orden creada correctamente',
-        order_id: orderId
+        order_id: order.id
       });
 
     } catch (error) {
-      console.error('CREATE ORDER ERROR:', error);
+      console.error(error);
 
       return res.status(500).json({
         message: 'Error creando orden',
@@ -84,50 +84,67 @@ const OrderController = {
       return res.json(orders);
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: 'Error obteniendo órdenes' });
+      return res.status(500).json({
+        message: 'Error obteniendo órdenes'
+      });
     }
   },
 
   async getOrderById(req, res) {
-  try {
-    const order = await OrderModel.getOrderById(
-      req.userId,
-      req.params.id
-    );
+    try {
+      const order = await OrderModel.getOrderById(
+        req.userId,
+        req.params.id
+      );
 
-    if (!order) {
-      return res.status(404).json({
-        message: 'Orden no encontrada'
+      if (!order) {
+        return res.status(404).json({
+          message: 'Orden no encontrada'
+        });
+      }
+
+      const rawItems = await OrderModel.getOrderItems(order.id);
+
+      const items = rawItems.map(item => {
+        let parsedColor = null;
+
+        try {
+          parsedColor = item.color
+            ? JSON.parse(item.color)
+            : null;
+        } catch (e) {
+          parsedColor = item.color; // fallback
+        }
+
+        return {
+          ...item,
+          color: parsedColor
+        };
+      });
+
+      const address = await OrderModel.getAddressById(
+        order.shipping_address_id
+      );
+
+      const payment_method = await OrderModel.getPaymentMethodById(
+        order.payment_method_id
+      );
+
+      return res.json({
+        ...order,
+        items,
+        address,
+        payment_method
+      });
+
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: 'Error obteniendo orden'
       });
     }
-
-    const items = await OrderModel.getOrderItems(
-      req.params.id
-    );
-
-    const address = await OrderModel.getOrderAddress(
-      req.params.id
-    );
-
-    console.log('🟢 ORDER ITEMS BACKEND:');
-    console.log(
-      JSON.stringify(items, null, 2)
-    );
-
-    return res.json({
-      ...order,
-      items,
-      address
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      message: 'Error obteniendo orden'
-    });
   }
-}
 
 };
 

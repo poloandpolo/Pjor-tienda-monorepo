@@ -514,7 +514,7 @@ class PaymentController {
     }
   }
 
- static async getOrderById(req, res) {
+static async getOrderById(req, res) {
   const userId = req.userId;
   const { id } = req.params;
 
@@ -522,23 +522,20 @@ class PaymentController {
     const order = await db('orders')
       .where({
         id,
-        user_id: userId,
+        user_id: userId
       })
       .first();
 
     if (!order) {
       return res.status(404).json({
-        error: 'Orden no encontrada',
+        error: 'Orden no encontrada'
       });
     }
 
     const items = await db('order_items as oi')
       .leftJoin(
         db('product_images as pi')
-          .select(
-            'product_id',
-            'image_url'
-          )
+          .select('product_id', 'image_url')
           .whereIn(
             'id',
             db('product_images')
@@ -550,41 +547,29 @@ class PaymentController {
         'pi.product_id'
       )
       .select(
-        'oi.id',
-        'oi.order_id',
-        'oi.product_id',
-        'oi.name',
-        'oi.price',
-        'oi.quantity',
-        'oi.size',
-        'oi.color',
+        'oi.*',
         'pi.image_url as image'
       )
-      .where({
-        'oi.order_id': id,
-      })
-      .orderBy('oi.id', 'asc');
+      .where('oi.order_id', id);
 
-    const formattedItems = items.map((item) => {
-      let parsedColor = null;
+    // 🔥 AQUÍ ESTABA TODO LO QUE FALTABA
 
-      try {
-        parsedColor = item.color
-          ? JSON.parse(item.color)
-          : null;
-      } catch (_) {
-        parsedColor = item.color;
-      }
+    const address = await db('addresses')
+      .where({ id: order.shipping_address_id })
+      .first();
 
-      return {
-        ...item,
-        color: parsedColor,
-      };
-    });
+    const payment_method = await db('payment_methods')
+      .where({ id: order.payment_method_id })
+      .first();
+
+    console.log('🟢 ADDRESS:', address);
+    console.log('🟢 PAYMENT METHOD:', payment_method);
 
     return res.json({
       ...order,
-      items: formattedItems,
+      items,
+      address,
+      payment_method
     });
 
   } catch (error) {
@@ -595,7 +580,7 @@ class PaymentController {
     );
 
     return res.status(500).json({
-      error: error.message,
+      error: error.message
     });
   }
 }

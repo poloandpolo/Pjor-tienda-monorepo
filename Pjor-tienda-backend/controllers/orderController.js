@@ -1,5 +1,4 @@
-const knexConfig = require('../knexfile');
-const knex = require('knex')(knexConfig.development);
+const db = require('../db/db');
 const OrderModel = require('../models/orderModel');
 
 const OrderController = {

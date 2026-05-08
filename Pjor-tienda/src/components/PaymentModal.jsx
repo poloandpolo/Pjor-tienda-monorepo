@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useMenPageContext } from '../context/MenPageContext';
 import { apiFetch } from '../services/api';
 
-const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentError }) => {
 

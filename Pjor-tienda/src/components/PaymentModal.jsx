@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useMenPageContext } from '../context/MenPageContext';
 import { apiFetch } from '../services/api';
 
-const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgHgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
+const stripePromise = loadStripe('pk_test_51Qf2tcLpCXSlpZd8CbVF0VVVASqhGgH1mLYskbI4yRH1TQaLSQVFMWaTkghcW1pu2zlVuH3rZHRGPI5n6uxZjFlu00HWzrjVSC');
 
 export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentError }) => {
 
@@ -77,9 +77,14 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
     e.preventDefault();
     setError(null);
 
+    const token = localStorage.getItem('jwt');
+
     try {
       const { clientSecret } = await apiFetch('/api/payments/create-setup-intent', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const stripe = stripeRef.current;
@@ -102,19 +107,17 @@ export const PaymentModal = ({ paymentModalOpen, closePaymentModal, onPaymentErr
       });
 
       if (result.error) {
-        setSuccess(true);
-        setError(null);
-
-        // 🔥 cerrar modal después de éxito
-        setTimeout(() => {
-          closePaymentModal();
-          setSuccess(false); // opcional: limpia estado para siguiente uso
-        }, 800);
+        setError(result.error.message || 'Error al validar tarjeta');
+        setSuccess(false);
         return;
       }
 
       const saveResponse = await apiFetch('/api/payments/save-payment-method', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           paymentMethodId: result.setupIntent.payment_method,
         }),

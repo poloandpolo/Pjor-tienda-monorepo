@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import './styles/AccountModal.scss';
 import { ProfileInfo } from './ProfileInfo';
 import OrdersSection from './OrdersSection';
+import { AddressesAndPaymentsSection } from './AddressesAndPaymentsSection';
 import {
   loginUser,
   registerUser,
@@ -21,6 +22,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [showAddressesAndPayments, setshowAddressesAndPayments] = useState(false);
 
   const [tempValues, setTempValues] = useState({});
 
@@ -171,7 +173,14 @@ export const AccountModal = ({ isVisible, onClose }) => {
   const handleBackToMenuClick = () => {
     setShowProfile(false);
     setShowOrders(false);
+    setshowAddressesAndPayments(false);
   };
+
+  const handleAddressesAndOrdersClick = () => {
+    setShowOrders(false);
+    setShowProfile(false);
+    setshowAddressesAndPayments(true);
+  }
 
   // ========================
   // PROFILE EDIT
@@ -213,9 +222,8 @@ export const AccountModal = ({ isVisible, onClose }) => {
   // ========================
   return (
     <div
-      className={`account-modal__overlay ${
-        isVisible ? 'show' : ''
-      }`}
+      className={`account-modal__overlay ${isVisible ? 'show' : ''
+        }`}
     >
       <div className="account-modal__content">
 
@@ -255,11 +263,33 @@ export const AccountModal = ({ isVisible, onClose }) => {
                 <h2>Tus pedidos</h2>
               </div>
 
-              <OrdersSection onBack={handleBackToMenuClick} />
+              <OrdersSection
+                onBack={handleBackToMenuClick}
+              />
+            </>
+
+          ) : showAddressesAndPayments ? ( // 🔥 NUEVO TERNARIO
+
+            <>
+              <div className="account-modal__title">
+                <h2>
+                  Direcciones y pagos
+                </h2>
+              </div>
+
+              <AddressesAndPaymentsSection />
+
+
+              <button
+                onClick={handleBackToMenuClick}
+              >
+                Volver
+              </button>
+
 
             </>
 
-          ) : (
+          ) : ( // 🔥 MENU PRINCIPAL
 
             <>
               <div className="account-modal__title">
@@ -270,6 +300,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
               </div>
 
               <div className="account-modal__menu">
+
                 <h2 onClick={handleViewProfileClick}>
                   Tu perfil
                 </h2>
@@ -278,8 +309,17 @@ export const AccountModal = ({ isVisible, onClose }) => {
                   Tus pedidos
                 </h2>
 
-                <h2>Promociones</h2>
-                <h2>Direcciones y pagos</h2>
+                <h2>
+                  Promociones
+                </h2>
+
+                <h2
+                  onClick={
+                    handleAddressesAndOrdersClick
+                  }
+                >
+                  Direcciones y pagos
+                </h2>
 
                 <button
                   className="account-modal__log-out-button"
@@ -287,12 +327,14 @@ export const AccountModal = ({ isVisible, onClose }) => {
                 >
                   Cerrar sesión
                 </button>
+
               </div>
             </>
 
           )
 
         ) : isForgotPassword ? (
+
 
           <>
             <div className="account-modal__title">

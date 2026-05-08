@@ -127,6 +127,9 @@ const OrdersSection = ({ onBack }) => {
     return (
       <div className="orders-section__empty">
         <h2>{error}</h2>
+        <button onClick={onBack}>
+          Volver
+        </button>
       </div>
     );
   }
@@ -135,6 +138,9 @@ const OrdersSection = ({ onBack }) => {
     return (
       <div className="orders-section__empty">
         <h2>No tienes pedidos aún</h2>
+        <button onClick={onBack}>
+          Volver
+        </button>
       </div>
     );
   }

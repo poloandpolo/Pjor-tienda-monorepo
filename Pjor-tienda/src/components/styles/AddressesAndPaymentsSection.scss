@@ -1,0 +1,24 @@
+.addresses-and-payment-section__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.addresses-and-payment-section__header-buttons {
+    margin-top: 27px;
+    width: 100vw;
+    background-color: aqua;
+
+    &-wrapper {
+        width: 40%;
+        display: flex;
+        margin: auto;
+        background-color: brown;
+    }
+
+    button {
+        margin: auto;
+    }
+
+}

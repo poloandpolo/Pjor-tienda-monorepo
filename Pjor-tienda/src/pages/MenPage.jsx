@@ -13,7 +13,8 @@ import { WarningModal } from '../components/WarningModal';
 import { Footer } from '../components/Footer';
 import { AccountButton } from '../components/AccountButton';
 import { AccountModal } from '../components/AccountModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 import { useMenPageContext } from '../context/MenPageContext';
 import { getProducts } from '../services/productService'; // 🔥 NUEVO
@@ -60,6 +61,8 @@ export const MenPage = () => {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   const { addToCart } = useMenPageContext();
 
   // 🔥 FETCH PRODUCTS
@@ -77,6 +80,12 @@ export const MenPage = () => {
 
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.openAccountModal) {
+      setIsAccountModalVisible(true);
+    }
+  }, [location.state]);
 
   const toggleAccountModal = () => {
     setIsAccountModalVisible(prev => !prev);
@@ -141,6 +150,7 @@ export const MenPage = () => {
         <AccountModal
           isVisible={isAccountModalVisible}
           onClose={toggleAccountModal}
+          openOrdersOnLoad={location.state?.openOrdersSection}
         />
 
         <AccountButton

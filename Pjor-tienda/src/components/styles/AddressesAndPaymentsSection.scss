@@ -1,24 +1,45 @@
-.addresses-and-payment-section__content {
-    display: flex;
+.addresses-and-payment-section__container {
     align-items: center;
     justify-content: center;
+    height: 105%;
 }
 
 
 .addresses-and-payment-section__header-buttons {
     margin-top: 27px;
-    width: 100vw;
-    background-color: aqua;
+    width: 100%;
 
     &-wrapper {
-        width: 40%;
+        width: 75%;
         display: flex;
         margin: auto;
-        background-color: brown;
+        justify-content: space-around;
+        margin-bottom: 30px;
     }
 
     button {
-        margin: auto;
+        all: unset;
+        height: 40px;
+        background-color: black;
+        color: white;
+        font-family: Permanent Marker;
+        transition: box-shadow 0.3s ease-in-out;
+        width: 150px;
+        text-align: center;
+        border-radius: 15px;
+        font-size: 17.5px;
+
+        &:hover {
+            background-color: white;
+            color: black;
+            transition: 0.2s;
+        }
     }
 
+}
+
+
+
+.addresses-and-payment-section__content {
+    height: 80%;
 }

@@ -74,7 +74,12 @@ const CheckoutPage = () => {
       console.log(response);
 
       alert('Pago exitoso');
-      navigate('/');
+      navigate('/hombre', {
+        state: {
+          openAccountModal: true,
+          openOrdersSection: true,
+        },
+      });
     } catch (error) {
       console.error(error);
       alert('Error procesando pago');
@@ -119,18 +124,16 @@ const CheckoutPage = () => {
 
           <div className="checkout-page__details-buttons-wrapper">
             <button
-              className={`checkout-page__shipping-button ${
-                activeSection === 'shipping' ? 'active' : ''
-              }`}
+              className={`checkout-page__shipping-button ${activeSection === 'shipping' ? 'active' : ''
+                }`}
               onClick={() => setActiveSection('shipping')}
             >
               envío
             </button>
 
             <button
-              className={`checkout-page__payment-button ${
-                activeSection === 'payment' ? 'active' : ''
-              }`}
+              className={`checkout-page__payment-button ${activeSection === 'payment' ? 'active' : ''
+                }`}
               onClick={() => setActiveSection('payment')}
             >
               pago

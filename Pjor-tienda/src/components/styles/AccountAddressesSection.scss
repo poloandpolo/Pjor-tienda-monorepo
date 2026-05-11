@@ -1,0 +1,95 @@
+.account-addresses-section {
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 12px;
+    transform: translateY(-25px);
+
+    &__back-button {
+        all: unset;
+        height: 45px;
+        background-color: black;
+        color: white;
+        font-family: Permanent Marker;
+        transition: box-shadow 0.3s ease-in-out;
+        width: 150px;
+        text-align: center;
+        border-radius: 15px;
+        font-size: 17.5px;
+
+        &:hover {
+            background-color: white;
+            color: black;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.10); 
+            transition: 0.2s;
+        }
+    }
+
+    &__container {
+        width: 90%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        gap: 18px;
+        margin-top: 20px;
+        margin: auto;
+    }
+
+    &__label {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+
+        &-button-wrapper {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        & label {
+            font-family: Permanent Marker;
+            color: black;
+            font-size: 22px;
+            width: 140px;
+        }
+
+        & button {
+            all: unset;
+            color: brown;
+            font-family: Barlow Condensed;
+            margin-left: 10px;
+            transform: translateY(-3px);
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    /* Inputs */
+    & input {
+        all: unset;
+        font-size: 20px;
+        font-family: Barlow Condensed;
+        color: black;
+        text-align: center;
+        border-radius: 13px;
+        width: 40%;
+        margin-left: 10px;
+        line-height: 35px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Placeholder */
+    & input::placeholder {
+        color: black;
+        opacity: 1;
+    }
+}

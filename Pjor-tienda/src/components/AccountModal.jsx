@@ -4,6 +4,7 @@ import './styles/AccountModal.scss';
 import { ProfileInfo } from './ProfileInfo';
 import OrdersSection from './OrdersSection';
 import { AddressesAndPaymentsSection } from './AddressesAndPaymentsSection';
+
 import {
   loginUser,
   registerUser,
@@ -12,18 +13,36 @@ import {
 
 import { useAuth } from '../context/authContext';
 
-export const AccountModal = ({ isVisible, onClose }) => {
-  const { user, isAuthenticated, login, logout } = useAuth();
+export const AccountModal = ({
+  isVisible,
+  onClose,
+  openOrdersOnLoad
+}) => {
+
+  const {
+    user,
+    isAuthenticated,
+    login,
+    logout
+  } = useAuth();
 
   // ========================
   // UI STATES
   // ========================
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  const [showOrders, setShowOrders] = useState(false);
-  const [showAddressesAndPayments, setshowAddressesAndPayments] = useState(false);
 
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  const [showProfile, setShowProfile] = useState(false);
+
+  const [showOrders, setShowOrders] = useState(false);
+
+  const [showAddressesAndPayments, setshowAddressesAndPayments] =
+    useState(false);
+
+  // ========================
+  // PROFILE STATES
+  // ========================
   const [tempValues, setTempValues] = useState({});
 
   const [editingFields, setEditingFields] = useState({
@@ -31,6 +50,20 @@ export const AccountModal = ({ isVisible, onClose }) => {
     lastName: false,
     email: false,
     password: false,
+  });
+
+  // ========================
+  // ADDRESS STATES
+  // ========================
+  const [addressTempValues, setAddressTempValues] = useState({});
+
+  const [addressEditingFields, setAddressEditingFields] = useState({
+    firstName: false,
+    lastName: false,
+    address: false,
+    city: false,
+    state: false,
+    postalCode: false,
   });
 
   const {
@@ -43,37 +76,68 @@ export const AccountModal = ({ isVisible, onClose }) => {
   // UI HEIGHT CONTROL
   // ========================
   useEffect(() => {
+
     const contentElement = document.querySelector(
       '.account-modal__content'
     );
 
     if (contentElement) {
+
       const getHeight = () => {
+
         if (showOrders) return '90vh';
+
         if (showProfile) return '90vh';
+
+        if (showAddressesAndPayments) return '90vh';
+
         if (isSignUp) return '80vh';
+
         if (isAuthenticated) return '90vh';
 
         return '60vh';
+
       };
 
       contentElement.style.setProperty(
         '--content-height',
         getHeight()
       );
+
     }
+
   }, [
     isSignUp,
     isAuthenticated,
     showProfile,
-    showOrders
+    showOrders,
+    showAddressesAndPayments
   ]);
+
+  // ========================
+  // OPEN ORDERS ON LOAD
+  // ========================
+  useEffect(() => {
+
+    if (isVisible && openOrdersOnLoad) {
+
+      setShowOrders(true);
+
+      setShowProfile(false);
+
+      setshowAddressesAndPayments(false);
+
+    }
+
+  }, [isVisible, openOrdersOnLoad]);
 
   // ========================
   // LOGIN
   // ========================
   const handleLoginClick = async (data) => {
+
     try {
+
       const result = await loginUser(data);
 
       if (!result?.token) {
@@ -83,18 +147,24 @@ export const AccountModal = ({ isVisible, onClose }) => {
       login(result.token);
 
       setIsSignUp(false);
+
       setIsForgotPassword(false);
 
     } catch (error) {
+
       console.error('Login error:', error);
+
     }
+
   };
 
   // ========================
   // REGISTER
   // ========================
   const handleRegister = async (data) => {
+
     try {
+
       await registerUser(data);
 
       const loginResult = await loginUser({
@@ -109,97 +179,146 @@ export const AccountModal = ({ isVisible, onClose }) => {
       login(loginResult.token);
 
       setIsSignUp(false);
+
       setIsForgotPassword(false);
 
     } catch (error) {
+
       console.error('Register error:', error);
+
     }
+
   };
 
   // ========================
   // PASSWORD
   // ========================
   const updatePassword = async (newPassword) => {
+
     try {
+
       await updateUserPassword({
         userId: user.id,
         password: newPassword
       });
+
     } catch (error) {
+
       console.error(error);
+
     }
+
   };
 
   // ========================
   // LOGOUT
   // ========================
   const handleLogoutClick = () => {
+
     logout();
 
     setShowProfile(false);
+
     setShowOrders(false);
+
+    setshowAddressesAndPayments(false);
+
     setIsSignUp(false);
+
     setIsForgotPassword(false);
+
   };
 
   // ========================
   // NAVIGATION
   // ========================
   const handleForgotPasswordClick = () => {
+
     setIsForgotPassword(true);
+
     setIsSignUp(false);
+
   };
 
   const handleBackToLoginClick = () => {
+
     setIsForgotPassword(false);
+
     setIsSignUp(false);
+
   };
 
   const handleSignUpClick = () => {
+
     setIsSignUp(true);
+
     setIsForgotPassword(false);
+
   };
 
   const handleViewProfileClick = () => {
+
     setShowProfile(true);
+
     setShowOrders(false);
+
+    setshowAddressesAndPayments(false);
+
   };
 
   const handleViewOrdersClick = () => {
-    setShowOrders(true);
-    setShowProfile(false);
-  };
 
-  const handleBackToMenuClick = () => {
+    setShowOrders(true);
+
     setShowProfile(false);
-    setShowOrders(false);
+
     setshowAddressesAndPayments(false);
+
   };
 
   const handleAddressesAndOrdersClick = () => {
+
     setShowOrders(false);
+
     setShowProfile(false);
+
     setshowAddressesAndPayments(true);
-  }
+
+  };
+
+  const handleBackToMenuClick = () => {
+
+    setShowProfile(false);
+
+    setShowOrders(false);
+
+    setshowAddressesAndPayments(false);
+
+  };
 
   // ========================
   // PROFILE EDIT
   // ========================
   const handleEditClick = (field) => {
+
     setEditingFields((prev) => ({
       ...prev,
       [field]: !prev[field],
     }));
+
   };
 
   const handleFieldChange = (field, value) => {
+
     setTempValues((prev) => ({
       ...prev,
       [field]: value,
     }));
+
   };
 
   const handleSaveClick = (field) => {
+
     if (field === 'password') {
       updatePassword(tempValues.password);
     }
@@ -208,32 +327,79 @@ export const AccountModal = ({ isVisible, onClose }) => {
       ...prev,
       [field]: false,
     }));
+
   };
 
   const handleCancelClick = (field) => {
+
     setEditingFields((prev) => ({
       ...prev,
       [field]: false,
     }));
+
+  };
+
+  // ========================
+  // ADDRESS EDIT
+  // ========================
+  const handleAddressEditClick = (field) => {
+
+    setAddressEditingFields((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+
+  };
+
+  const handleAddressFieldChange = (field, value) => {
+
+    setAddressTempValues((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+  };
+
+  const handleAddressSaveClick = (field) => {
+
+    setAddressEditingFields((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
+
+  };
+
+  const handleAddressCancelClick = (field) => {
+
+    setAddressEditingFields((prev) => ({
+      ...prev,
+      [field]: false,
+    }));
+
   };
 
   // ========================
   // RENDER
   // ========================
   return (
-    <div
-      className={`account-modal__overlay ${isVisible ? 'show' : ''
-        }`}
-    >
-      <div className="account-modal__content">
 
-        <div className="account-modal__close-wrapper">
+    <div
+      className={`account-modal__overlay ${
+        isVisible ? 'show' : ''
+      }`}
+    >
+
+      <div className='account-modal__content'>
+
+        <div className='account-modal__close-wrapper'>
+
           <button
-            className="account-modal__close-button"
+            className='account-modal__close-button'
             onClick={onClose}
           >
             X
           </button>
+
         </div>
 
         {isAuthenticated ? (
@@ -241,8 +407,10 @@ export const AccountModal = ({ isVisible, onClose }) => {
           showProfile ? (
 
             <>
-              <div className="account-modal__title">
-                <h2>Tu perfil</h2>
+              <div className='account-modal__title'>
+                <h2>
+                  Tu perfil
+                </h2>
               </div>
 
               <ProfileInfo
@@ -259,8 +427,10 @@ export const AccountModal = ({ isVisible, onClose }) => {
           ) : showOrders ? (
 
             <>
-              <div className="account-modal__title">
-                <h2>Tus pedidos</h2>
+              <div className='account-modal__title'>
+                <h2>
+                  Tus pedidos
+                </h2>
               </div>
 
               <OrdersSection
@@ -268,38 +438,53 @@ export const AccountModal = ({ isVisible, onClose }) => {
               />
             </>
 
-          ) : showAddressesAndPayments ? ( // 🔥 NUEVO TERNARIO
+          ) : showAddressesAndPayments ? (
 
             <>
-              <div className="account-modal__title">
+              <div className='account-modal__title'>
                 <h2>
                   Direcciones y pagos
                 </h2>
               </div>
 
-              <AddressesAndPaymentsSection />
+              <AddressesAndPaymentsSection
+                handleBackToMenuClick={handleBackToMenuClick}
 
+                editingFields={addressEditingFields}
 
-              <button
-                onClick={handleBackToMenuClick}
-              >
-                Volver
-              </button>
+                handleFieldChange={
+                  handleAddressFieldChange
+                }
 
+                handleEditClick={
+                  handleAddressEditClick
+                }
 
+                handleSaveClick={
+                  handleAddressSaveClick
+                }
+
+                handleCancelClick={
+                  handleAddressCancelClick
+                }
+
+                tempValues={addressTempValues}
+              />
             </>
 
-          ) : ( // 🔥 MENU PRINCIPAL
+          ) : (
 
             <>
-              <div className="account-modal__title">
+              <div className='account-modal__title'>
+
                 <h2>
                   Bienvenido,{' '}
                   {user?.first_name || 'Usuario'}
                 </h2>
+
               </div>
 
-              <div className="account-modal__menu">
+              <div className='account-modal__menu'>
 
                 <h2 onClick={handleViewProfileClick}>
                   Tu perfil
@@ -322,7 +507,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
                 </h2>
 
                 <button
-                  className="account-modal__log-out-button"
+                  className='account-modal__log-out-button'
                   onClick={handleLogoutClick}
                 >
                   Cerrar sesión
@@ -335,16 +520,20 @@ export const AccountModal = ({ isVisible, onClose }) => {
 
         ) : isForgotPassword ? (
 
-
           <>
-            <div className="account-modal__title">
-              <h2>Recupera tu contraseña</h2>
+            <div className='account-modal__title'>
+
+              <h2>
+                Recupera tu contraseña
+              </h2>
+
             </div>
 
-            <div className="account-modal__input-wrapper">
+            <div className='account-modal__input-wrapper'>
+
               <input
-                placeholder="Email"
-                type="email"
+                placeholder='Email'
+                type='email'
               />
 
               <button>
@@ -356,22 +545,28 @@ export const AccountModal = ({ isVisible, onClose }) => {
               >
                 Volver a iniciar sesión
               </label>
+
             </div>
           </>
 
         ) : isSignUp ? (
 
           <>
-            <div className="account-modal__title">
-              <h2>Crea tu cuenta</h2>
+            <div className='account-modal__title'>
+
+              <h2>
+                Crea tu cuenta
+              </h2>
+
             </div>
 
             <form
               onSubmit={handleSubmit(handleRegister)}
-              className="account-modal__input-wrapper"
+              className='account-modal__input-wrapper'
             >
+
               <input
-                placeholder="Nombre"
+                placeholder='Nombre'
                 {...register(
                   'firstName',
                   { required: true }
@@ -381,7 +576,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
               {errors.firstName && <p>Error</p>}
 
               <input
-                placeholder="Apellido"
+                placeholder='Apellido'
                 {...register(
                   'lastName',
                   { required: true }
@@ -389,7 +584,7 @@ export const AccountModal = ({ isVisible, onClose }) => {
               />
 
               <input
-                placeholder="Email"
+                placeholder='Email'
                 {...register(
                   'email',
                   { required: true }
@@ -397,15 +592,15 @@ export const AccountModal = ({ isVisible, onClose }) => {
               />
 
               <input
-                placeholder="Contraseña"
-                type="password"
+                placeholder='Contraseña'
+                type='password'
                 {...register(
                   'password',
                   { required: true }
                 )}
               />
 
-              <button type="submit">
+              <button type='submit'>
                 Registrar
               </button>
 
@@ -414,19 +609,25 @@ export const AccountModal = ({ isVisible, onClose }) => {
               >
                 Volver a iniciar sesión
               </label>
+
             </form>
           </>
 
         ) : (
 
           <>
-            <div className="account-modal__title">
-              <h2>Entra a tu cuenta</h2>
+            <div className='account-modal__title'>
+
+              <h2>
+                Entra a tu cuenta
+              </h2>
+
             </div>
 
-            <div className="account-modal__input-wrapper">
+            <div className='account-modal__input-wrapper'>
+
               <input
-                placeholder="Email"
+                placeholder='Email'
                 {...register(
                   'email',
                   { required: true }
@@ -434,8 +635,8 @@ export const AccountModal = ({ isVisible, onClose }) => {
               />
 
               <input
-                placeholder="Contraseña"
-                type="password"
+                placeholder='Contraseña'
+                type='password'
                 {...register(
                   'password',
                   { required: true }
@@ -463,12 +664,16 @@ export const AccountModal = ({ isVisible, onClose }) => {
               >
                 Crear cuenta
               </label>
+
             </div>
           </>
 
         )}
 
       </div>
+
     </div>
+
   );
+
 };

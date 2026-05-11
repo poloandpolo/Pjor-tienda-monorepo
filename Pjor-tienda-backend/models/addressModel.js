@@ -1,40 +1,118 @@
 // models/addressModel.js
+
 const db = require('../db/db');
 
-const createAddress = async (userId, addressData) => {
-  try {
-    // Insertamos la nueva dirección en la base de datos
-    const [id] = await db('addresses').insert({
-      user_id: userId,  // Debe usarse el userId obtenido del token
-      first_name: addressData.first_name,
-      last_name: addressData.last_name,
-      address: addressData.address,
-      city: addressData.city,
-      state: addressData.state,
-      postal_code: addressData.postal_code,
-      phone: addressData.phone,
-    }).returning('id');
+// ==========================
+// CREATE ADDRESS
+// ==========================
+const createAddress = async (
+    userId,
+    addressData
+) => {
 
-    return id; // Devuelve el ID de la nueva dirección
-  } catch (error) {
-    throw error; // Propagamos el error si ocurre un fallo en la inserción
-  }
+    try {
+
+        const [id] = await db('addresses')
+            .insert({
+                user_id: userId,
+                first_name: addressData.first_name,
+                last_name: addressData.last_name,
+                address: addressData.address,
+                city: addressData.city,
+                state: addressData.state,
+                postal_code: addressData.postal_code,
+                phone: addressData.phone,
+            })
+            .returning('id');
+
+        return id;
+
+    } catch (error) {
+
+        throw error;
+
+    }
+
 };
 
-const getUserAddresses = async (userId) => {
-  try {
-    // Obtenemos las direcciones asociadas al userId desde la base de datos
-    const addresses = await db('addresses')
-      .select('id', 'first_name', 'last_name', 'address', 'city', 'state', 'postal_code', 'phone')
-      .where({ user_id: userId });
+// ==========================
+// GET USER ADDRESSES
+// ==========================
+const getUserAddresses = async (
+    userId
+) => {
 
-    return addresses; // Devolvemos la lista de direcciones
-  } catch (error) {
-    throw error; // Propagamos el error si ocurre un fallo en la consulta
-  }
+    try {
+
+        const addresses = await db('addresses')
+            .select(
+                'id',
+                'first_name',
+                'last_name',
+                'address',
+                'city',
+                'state',
+                'postal_code',
+                'phone'
+            )
+            .where({
+                user_id: userId
+            });
+
+        return addresses;
+
+    } catch (error) {
+
+        throw error;
+
+    }
+
 };
 
-module.exports = { 
-  createAddress, 
-  getUserAddresses 
+// ==========================
+// UPDATE ADDRESS
+// ==========================
+const updateAddress = async (
+    addressId,
+    userId,
+    updates
+) => {
+
+    try {
+
+        // Seguridad:
+        // solo actualiza addresses
+        // pertenecientes al usuario
+
+        const updatedRows = await db('addresses')
+            .where({
+                id: addressId,
+                user_id: userId
+            })
+            .update(updates)
+            .returning([
+                'id',
+                'first_name',
+                'last_name',
+                'address',
+                'city',
+                'state',
+                'postal_code',
+                'phone'
+            ]);
+
+        return updatedRows[0];
+
+    } catch (error) {
+
+        throw error;
+
+    }
+
+};
+
+module.exports = {
+    createAddress,
+    getUserAddresses,
+    updateAddress
 };

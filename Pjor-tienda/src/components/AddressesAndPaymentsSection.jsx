@@ -1,6 +1,7 @@
 import React from 'react';
 import './styles/AddressesAndPaymentsSection.scss';
 import { AccountAddressesSection } from './AccountAddressesSection';
+import thrash_can from '/thrash_can.png'
 
 export const AddressesAndPaymentsSection = ({
     handleBackToMenuClick,
@@ -33,6 +34,8 @@ export const AddressesAndPaymentsSection = ({
                     <button>
                         Pagos
                     </button>
+
+                    <img src={thrash_can}/>
 
                 </div>
 

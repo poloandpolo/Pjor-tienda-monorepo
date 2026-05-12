@@ -15,6 +15,18 @@
         margin: auto;
         justify-content: space-around;
         margin-bottom: 30px;
+
+        img{
+            height: 5.5%;
+            width: 5.5%;
+            right: 0;
+            position: absolute;
+            transform: translate(-80%, -15%);
+
+            &:hover{
+                cursor: pointer;
+            }
+        }
     }
 
     button {

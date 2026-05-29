@@ -29,6 +29,17 @@
         }
     }
 
+      .addresses-and-payment-section__add_address_button{
+        all: unset;
+        position: absolute;
+        left: 0;
+        margin-left: 8%;
+        font-family: Permanent marker;
+        font-size: 50px;
+        color: black;
+        transform: translateY(-28%);
+    }
+
     button {
         all: unset;
         height: 40px;

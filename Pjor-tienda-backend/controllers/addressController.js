@@ -146,8 +146,45 @@ const updateAddress = async (req, res) => {
 
 };
 
+const deleteAddress = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const deleted =
+            await addressModel.softDeleteAddress(
+                id,
+                req.userId
+            );
+
+        if (!deleted) {
+
+            return res.status(404).json({
+                message: 'Dirección no encontrada'
+            });
+
+        }
+
+        return res.status(200).json({
+            message: 'Dirección eliminada'
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            message: error.message
+        });
+
+    }
+
+};
+
 module.exports = {
     createAddress,
     getUserAddresses,
-    updateAddress
+    updateAddress,
+    deleteAddress
 };

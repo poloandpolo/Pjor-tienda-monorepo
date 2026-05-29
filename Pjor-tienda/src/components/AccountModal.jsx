@@ -351,30 +351,56 @@ export const AccountModal = ({
 
   };
 
-  const handleAddressFieldChange = (field, value) => {
+  const handleAddressFieldChange = (addressId, field, value) => {
 
     setAddressTempValues((prev) => ({
       ...prev,
-      [field]: value,
+      [addressId]: {
+        ...prev[addressId],
+        [field]: value,
+      },
     }));
 
   };
 
-  const handleAddressSaveClick = (field) => {
+  const handleAddressSaveClick = (field, addressId) => {
 
     setAddressEditingFields((prev) => ({
       ...prev,
       [field]: false,
     }));
 
+    // limpiar cache de edición de esa dirección
+    setAddressTempValues((prev) => {
+      const copy = { ...prev };
+      if (copy[addressId]) {
+        delete copy[addressId][field];
+      }
+      return copy;
+    });
+
   };
 
-  const handleAddressCancelClick = (field) => {
+  const handleAddressCancelClick = (field, addressId) => {
 
     setAddressEditingFields((prev) => ({
       ...prev,
       [field]: false,
     }));
+
+    setAddressTempValues((prev) => {
+      const copy = { ...prev };
+
+      if (copy[addressId]) {
+        delete copy[addressId][field];
+
+        if (Object.keys(copy[addressId]).length === 0) {
+          delete copy[addressId];
+        }
+      }
+
+      return copy;
+    });
 
   };
 
@@ -384,9 +410,8 @@ export const AccountModal = ({
   return (
 
     <div
-      className={`account-modal__overlay ${
-        isVisible ? 'show' : ''
-      }`}
+      className={`account-modal__overlay ${isVisible ? 'show' : ''
+        }`}
     >
 
       <div className='account-modal__content'>

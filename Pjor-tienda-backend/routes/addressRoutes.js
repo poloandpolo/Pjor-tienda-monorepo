@@ -27,4 +27,10 @@ router.put(
     addressController.updateAddress
 );
 
+router.delete(
+    '/addresses/:id',
+    verifyToken,
+    addressController.deleteAddress
+);
+
 module.exports = router;

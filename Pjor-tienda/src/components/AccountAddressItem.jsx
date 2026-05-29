@@ -27,6 +27,7 @@ export const AccountAddressItem = ({
         const isEditing = editingFields[key];
 
         return (
+
             <div className='account-addresses-section__label'>
 
                 <label>{label}:</label>
@@ -34,19 +35,29 @@ export const AccountAddressItem = ({
                 <input
                     type='text'
                     placeholder={addressData[dbKey] ?? ''}
-
                     disabled={!isEditing}
                     ref={inputRefs[key]}
 
-                    // 🔴 FIX IMPORTANTE: input siempre sincronizado con data real o temp
                     value={
                         isEditing
-                            ? (tempValues?.[key] ?? '')
-                            : (addressData[dbKey] ?? '')
+                            ? (
+                                tempValues
+                                    ?.[addressData.id]
+                                    ?.[key] ?? ''
+                            )
+                            : (
+                                addressData[dbKey] ?? ''
+                            )
                     }
 
                     onChange={(e) =>
-                        handleFieldChange(key, e.target.value)
+
+                        handleFieldChange(
+                            addressData.id,
+                            key,
+                            e.target.value
+                        )
+
                     }
                 />
 
@@ -55,25 +66,40 @@ export const AccountAddressItem = ({
                     <div className='account-addresses-section__label-button-wrapper'>
 
                         <button
+
                             onClick={async () => {
 
                                 try {
 
-                                    const newValue = tempValues?.[key];
+                                    const newValue =
+                                        tempValues
+                                            ?.[addressData.id]
+                                            ?.[key];
 
-                                    await updateAddress(addressData.id, {
-                                        [dbKey]: newValue
-                                    });
+                                    if (
+                                        newValue === undefined
+                                    ) {
+                                        return;
+                                    }
 
-                                    handleSaveClick(key);
+                                    await updateAddress(
+                                        addressData.id,
+                                        {
+                                            [dbKey]: newValue
+                                        }
+                                    );
 
-                                    // 🔴 FIX: actualización inmediata local (evita depender del fetch)
-                                    addressData[dbKey] = newValue;
+                                    handleSaveClick(
+                                        key,
+                                        addressData.id
+                                    );
 
-                                    fetchAddresses();
+                                    await fetchAddresses();
 
                                 } catch (err) {
+
                                     console.error(err);
+
                                 }
 
                             }}
@@ -82,7 +108,14 @@ export const AccountAddressItem = ({
                         </button>
 
                         <button
-                            onClick={() => handleCancelClick(key)}
+                            onClick={() =>
+
+                                handleCancelClick(
+                                    key,
+                                    addressData.id
+                                )
+
+                            }
                         >
                             Cancelar
                         </button>
@@ -95,6 +128,7 @@ export const AccountAddressItem = ({
                         onClick={() => {
 
                             handleEditClick(key);
+
                             handleFocus?.(key);
 
                         }}
@@ -105,19 +139,53 @@ export const AccountAddressItem = ({
                 )}
 
             </div>
+
         );
+
     };
 
     return (
+
         <div className='account-addresses-section__container'>
 
-            {renderField('firstName', 'Nombre', 'first_name')}
-            {renderField('lastName', 'Apellido', 'last_name')}
-            {renderField('address', 'Dirección', 'address')}
-            {renderField('city', 'Ciudad', 'city')}
-            {renderField('state', 'Estado', 'state')}
-            {renderField('postalCode', 'Código postal', 'postal_code')}
+            {renderField(
+                'firstName',
+                'Nombre',
+                'first_name'
+            )}
+
+            {renderField(
+                'lastName',
+                'Apellido',
+                'last_name'
+            )}
+
+            {renderField(
+                'address',
+                'Dirección',
+                'address'
+            )}
+
+            {renderField(
+                'city',
+                'Ciudad',
+                'city'
+            )}
+
+            {renderField(
+                'state',
+                'Estado',
+                'state'
+            )}
+
+            {renderField(
+                'postalCode',
+                'Código postal',
+                'postal_code'
+            )}
 
         </div>
+
     );
+
 };

@@ -57,7 +57,9 @@ const getUserAddresses = async (
             )
             .where({
                 user_id: userId
-            });
+            })
+            .whereNull('deleted_at')
+            .orderBy('id', 'asc');
 
         return addresses;
 
@@ -111,8 +113,36 @@ const updateAddress = async (
 
 };
 
+const softDeleteAddress = async (
+    addressId,
+    userId
+) => {
+
+    try {
+
+        const updatedRows = await db('addresses')
+            .where({
+                id: addressId,
+                user_id: userId
+            })
+            .whereNull('deleted_at')
+            .update({
+                deleted_at: db.fn.now()
+            });
+
+        return updatedRows;
+
+    } catch (error) {
+
+        throw error;
+
+    }
+
+};
+
 module.exports = {
     createAddress,
     getUserAddresses,
-    updateAddress
+    updateAddress,
+    softDeleteAddress
 };

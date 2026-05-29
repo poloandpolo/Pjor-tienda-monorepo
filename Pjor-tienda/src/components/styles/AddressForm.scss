@@ -9,13 +9,19 @@
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   /* Fondo semi-transparente */
-  z-index: 1000;  
+  z-index: 1000;
   /* Asegúrate de que el modal esté por encima del contenido */
   opacity: 0;
   /* Oculto inicialmente */
   visibility: hidden;
   /* Ocultar completamente cuando no está visible */
   transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
   /* Transición suave */
 }
 

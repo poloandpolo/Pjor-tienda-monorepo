@@ -40,3 +40,16 @@ export const updateAddress = (
     );
 
 };
+
+export const deleteAddress = (
+    addressId
+) => {
+
+    return apiFetch(
+        `/api/addresses/${addressId}`,
+        {
+            method: 'DELETE',
+        }
+    );
+
+};

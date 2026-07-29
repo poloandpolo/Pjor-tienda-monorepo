@@ -59,6 +59,27 @@ const OrderController = {
 
         await OrderModel.createOrderItems(trx, orderItems);
 
+        // =====================================
+        // SNAPSHOT PAYMENT METHOD
+        // =====================================
+
+        const paymentMethod = await OrderModel.getPaymentMethodById(
+          payment_method_id,
+          trx
+        );
+
+        if (!paymentMethod) {
+          throw new Error('Método de pago no encontrado');
+        }
+
+        await OrderModel.createOrderPaymentMethod(trx, {
+          order_id: newOrder.id,
+          brand: paymentMethod.brand,
+          last4: paymentMethod.last4,
+          exp_month: paymentMethod.exp_month,
+          exp_year: paymentMethod.exp_year
+        });
+
         return newOrder;
       });
 
@@ -80,9 +101,12 @@ const OrderController = {
   async getUserOrders(req, res) {
     try {
       const orders = await OrderModel.getUserOrders(req.userId);
+
       return res.json(orders);
+
     } catch (error) {
       console.error(error);
+
       return res.status(500).json({
         message: 'Error obteniendo órdenes'
       });
@@ -102,7 +126,9 @@ const OrderController = {
         });
       }
 
-      const rawItems = await OrderModel.getOrderItems(order.id);
+      const rawItems = await OrderModel.getOrderItems(
+        order.id
+      );
 
       const items = rawItems.map(item => {
         let parsedColor = null;
@@ -112,7 +138,7 @@ const OrderController = {
             ? JSON.parse(item.color)
             : null;
         } catch (e) {
-          parsedColor = item.color; // fallback
+          parsedColor = item.color;
         }
 
         return {
@@ -125,9 +151,14 @@ const OrderController = {
         order.shipping_address_id
       );
 
-      const payment_method = await OrderModel.getPaymentMethodById(
-        order.payment_method_id
-      );
+      // =====================================
+      // PAYMENT SNAPSHOT
+      // =====================================
+
+      const payment_method =
+        await OrderModel.getOrderPaymentMethod(
+          order.id
+        );
 
       return res.json({
         ...order,

@@ -83,6 +83,7 @@
     align-items: center; // Alinea los elementos horizontalmente
     border-radius: 10px;
     transform: translateX(-2.2vw) translateY(-3vw);
+    z-index: 2000;
   }
 
   &__details-label-size {

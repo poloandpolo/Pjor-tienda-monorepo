@@ -1,16 +1,19 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
+// Clave secreta para JWT
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
-// Función para crear un nuevo usuario
+// ==============================
+// Crear usuario
+// ==============================
 const createUser = async (req, res) => {
 
-  // Extraemos los datos enviados desde el frontend
   const { firstName, lastName, email, password } = req.body;
 
   try {
 
-    // Verificamos si el email ya está registrado
     const existingUser = await userModel.getUserByEmail(email);
 
     if (existingUser) {
@@ -19,10 +22,8 @@ const createUser = async (req, res) => {
       });
     }
 
-    // Encriptamos la contraseña antes de guardarla
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Llamamos al modelo para crear el usuario en la base de datos
     const userId = await userModel.createUser({
       first_name: firstName,
       last_name: lastName,
@@ -48,19 +49,111 @@ const createUser = async (req, res) => {
 };
 
 
+// ==============================
+// Actualizar usuario
+// ==============================
+const updateUser = async (req, res) => {
 
+  const {
+    userId,
+    firstName,
+    lastName,
+    email,
+    password
+  } = req.body;
+
+  try {
+
+    // Verificar si el email ya existe
+    if (email) {
+
+      const existingUser = await userModel.getUserByEmail(email);
+
+      if (
+        existingUser &&
+        existingUser.id !== Number(userId)
+      ) {
+        return res.status(400).json({
+          message: 'El correo electrónico ya está registrado.'
+        });
+      }
+
+    }
+
+    // Construir objeto de actualización
+    const updatedData = {};
+
+    if (firstName !== undefined) {
+      updatedData.first_name = firstName;
+    }
+
+    if (lastName !== undefined) {
+      updatedData.last_name = lastName;
+    }
+
+    if (email !== undefined) {
+      updatedData.email = email;
+    }
+
+    if (password !== undefined) {
+      updatedData.password = await bcrypt.hash(password, 10);
+    }
+
+    if (Object.keys(updatedData).length === 0) {
+      return res.status(400).json({
+        message: 'No se enviaron datos para actualizar.'
+      });
+    }
+
+    // Actualizar usuario
+    await userModel.updateUser(userId, updatedData);
+
+    // Obtener usuario actualizado
+    const updatedUser = await userModel.getUserById(userId);
+
+    // Generar nuevo JWT
+    const token = jwt.sign(
+      {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name
+      },
+      JWT_SECRET,
+      {
+        expiresIn: '1h'
+      }
+    );
+
+    return res.status(200).json({
+      message: 'Usuario actualizado correctamente.',
+      token
+    });
+
+  } catch (error) {
+
+    console.error('Error actualizando usuario:', error);
+
+    return res.status(500).json({
+      message: 'Error actualizando usuario.'
+    });
+
+  }
+
+};
+
+
+// ==============================
 // Actualizar contraseña
+// ==============================
 const updatePassword = async (req, res) => {
 
-  // Datos enviados desde Postman o frontend
   const { userId, password } = req.body;
 
   try {
 
-    // Encriptamos la nueva contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Llamamos al modelo para actualizar la contraseña
     await userModel.updatePassword(userId, hashedPassword);
 
     return res.json({
@@ -80,8 +173,11 @@ const updatePassword = async (req, res) => {
 };
 
 
-// Exportamos las funciones para que puedan usarse en las rutas
+// ==============================
+// Exportaciones
+// ==============================
 module.exports = {
   createUser,
-  updatePassword
+  updatePassword,
+  updateUser
 };

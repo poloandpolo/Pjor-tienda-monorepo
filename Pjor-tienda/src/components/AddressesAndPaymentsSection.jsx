@@ -15,12 +15,20 @@ import {
 } from './AddressForm';
 
 import {
+    PaymentModal
+} from './PaymentModal';
+
+import {
     deleteAddress
 } from '../services/addressService';
 
 import {
     useMenPageContext
 } from '../context/MenPageContext';
+
+import {
+    deletePaymentMethod
+} from '../services/paymentService';
 
 import thrash_can from '/thrash_can.png';
 
@@ -40,19 +48,27 @@ export const AddressesAndPaymentsSection = ({
     tempValues
 }) => {
 
+    const [activePaymentMethodId, setActivePaymentMethodId] =
+        useState(null);
+
     const [activeAddressId, setActiveAddressId] =
         useState(null);
 
     const [activeSection, setActiveSection] =
         useState('addresses');
 
-    // ✅ NUEVO ESTADO DEL MODAL
     const [showAddressForm, setShowAddressForm] =
         useState(false);
 
+    const [showPaymentModal, setShowPaymentModal] =
+        useState(false);
+
+
     const {
-        fetchAddresses
+        fetchAddresses,
+        fetchPaymentMethods
     } = useMenPageContext();
+
 
     const handleDeleteAddress = async () => {
 
@@ -80,6 +96,36 @@ export const AddressesAndPaymentsSection = ({
 
     };
 
+
+    const handleDeletePayment = async () => {
+
+        try {
+
+            if (!activePaymentMethodId) return;
+
+            const confirmed = window.confirm(
+                '¿Eliminar este método de pago?'
+            );
+
+            if (!confirmed) return;
+
+            await deletePaymentMethod(
+                activePaymentMethodId
+            );
+
+            await fetchPaymentMethods();
+
+            setActivePaymentMethodId(null);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    };
+
+
     return (
 
         <div className='addresses-and-payment-section__container'>
@@ -88,14 +134,28 @@ export const AddressesAndPaymentsSection = ({
 
                 <div className='addresses-and-payment-section__header-buttons-wrapper'>
 
+
                     <button
                         className='addresses-and-payment-section__add_address_button'
-                        onClick={() =>
-                            setShowAddressForm(true)
-                        }
+                        onClick={() => {
+
+                            if (
+                                activeSection === 'addresses'
+                            ) {
+
+                                setShowAddressForm(true);
+
+                            } else {
+
+                                setShowPaymentModal(true);
+
+                            }
+
+                        }}
                     >
                         +
                     </button>
+
 
                     <button
                         onClick={() =>
@@ -105,6 +165,7 @@ export const AddressesAndPaymentsSection = ({
                         Direcciones
                     </button>
 
+
                     <button
                         onClick={() =>
                             setActiveSection('payments')
@@ -113,16 +174,32 @@ export const AddressesAndPaymentsSection = ({
                         Pagos
                     </button>
 
+
                     <img
                         src={thrash_can}
-                        onClick={handleDeleteAddress}
+                        onClick={() => {
+
+                            if (
+                                activeSection === 'addresses'
+                            ) {
+
+                                handleDeleteAddress();
+
+                            } else {
+
+                                handleDeletePayment();
+
+                            }
+
+                        }}
                     />
+
 
                 </div>
 
             </div>
 
-            {/* ✅ ADDRESS FORM */}
+
             <AddressForm
                 modalOpen={showAddressForm}
                 closeModal={() =>
@@ -133,7 +210,20 @@ export const AddressesAndPaymentsSection = ({
                 }
             />
 
+
+            <PaymentModal
+                paymentModalOpen={showPaymentModal}
+                closePaymentModal={() =>
+                    setShowPaymentModal(false)
+                }
+                onPaymentError={() =>
+                    setShowPaymentModal(false)
+                }
+            />
+
+
             <div className='addresses-and-payment-section__content'>
+
 
                 {
                     activeSection === 'addresses' && (
@@ -177,13 +267,25 @@ export const AddressesAndPaymentsSection = ({
                     )
                 }
 
+
                 {
                     activeSection === 'payments' && (
 
-                        <AccountPaymentSection />
+                        <AccountPaymentSection
+
+                            handleBackToMenuClick={
+                                handleBackToMenuClick
+                            }
+
+                            setActivePaymentMethodId={
+                                setActivePaymentMethodId
+                            }
+
+                        />
 
                     )
                 }
+
 
             </div>
 

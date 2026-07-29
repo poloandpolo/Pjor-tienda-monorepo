@@ -20,4 +20,6 @@ router.post('/checkout', verifyToken, PaymentController.checkout);
 router.get('/orders', verifyToken, PaymentController.getUserOrders);
 router.get('/orders/:id', verifyToken, PaymentController.getOrderById);
 
+router.delete('/payment-methods/:id', verifyToken, PaymentController.deletePaymentMethod);
+
 module.exports = router;

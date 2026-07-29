@@ -238,6 +238,36 @@ class PaymentModel {
       throw new Error(`Error obteniendo productos: ${error.message}`);
     }
   }
+
+  static async deletePaymentMethod(userId, paymentMethodId) {
+  const paymentMethod = await db('payment_methods')
+    .where({
+      id: paymentMethodId,
+      user_id: userId,
+    })
+    .first();
+
+  if (!paymentMethod) {
+    const error = new Error(
+      'Método de pago no encontrado'
+    );
+    error.code = 'PAYMENT_METHOD_NOT_FOUND';
+    throw error;
+  }
+
+  await stripe.paymentMethods.detach(
+    paymentMethod.stripe_payment_method_id
+  );
+
+  await db('payment_methods')
+    .where({
+      id: paymentMethodId,
+      user_id: userId,
+    })
+    .del();
+
+  return true;
+}
 }
 
 module.exports = PaymentModel;

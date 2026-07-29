@@ -584,6 +584,48 @@ static async getOrderById(req, res) {
     });
   }
 }
+
+static async deletePaymentMethod(req, res) {
+  const userId = req.userId;
+  const { id } = req.params;
+
+  try {
+    await PaymentModel.deletePaymentMethod(
+      userId,
+      id
+    );
+
+    return res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+
+    if (
+      error.code ===
+      'PAYMENT_METHOD_NOT_FOUND'
+    ) {
+      return res.status(404).json({
+        error: error.message,
+      });
+    }
+
+    PaymentController.logError(
+      'DELETE PAYMENT METHOD',
+      error,
+      {
+        userId,
+        paymentMethodId: id,
+      }
+    );
+
+    return res.status(500).json({
+      error: error.message,
+    });
+  }
 }
+
+}
+
+
 
 module.exports = PaymentController;

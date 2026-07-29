@@ -14,8 +14,8 @@ export const registerUser = (data) => {
   });
 };
 
-export const updateUserPassword = (data) => {
-  return apiFetch('/users/password', {
+export const updateUser = (data) => {
+  return apiFetch('/users', {
     method: 'PUT',
     body: JSON.stringify(data),
   });

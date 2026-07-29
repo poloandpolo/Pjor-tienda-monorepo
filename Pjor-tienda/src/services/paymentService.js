@@ -36,6 +36,12 @@ export const getPaymentMethods = async () => {
   });
 };
 
+export const deletePaymentMethod = async (id) => {
+  return apiFetch(`/api/payments/payment-methods/${id}`, {
+    method: 'DELETE',
+  });
+};
+
 
 export const checkout = async ({
   shippingAddressId,

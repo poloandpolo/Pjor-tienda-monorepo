@@ -2,16 +2,16 @@
 const db = require('../db/db');
 
 
-// Función para verificar si el correo ya está registrado
+// ==============================
+// Obtener usuario por email
+// ==============================
 const getUserByEmail = async (email) => {
   try {
 
-    // Buscamos un usuario con ese email
     const user = await db('users')
       .where({ email })
       .first();
 
-    // Devuelve el usuario si existe o undefined si no existe
     return user;
 
   } catch (error) {
@@ -22,16 +22,36 @@ const getUserByEmail = async (email) => {
 };
 
 
-// Función para crear un nuevo usuario
+// ==============================
+// Obtener usuario por ID
+// ==============================
+const getUserById = async (userId) => {
+  try {
+
+    const user = await db('users')
+      .where({ id: userId })
+      .first();
+
+    return user;
+
+  } catch (error) {
+
+    throw error;
+
+  }
+};
+
+
+// ==============================
+// Crear usuario
+// ==============================
 const createUser = async (userData) => {
   try {
 
-    // Insertamos el nuevo usuario
     const [id] = await db('users')
       .insert(userData)
       .returning('id');
 
-    // Devolvemos el ID generado
     return id;
 
   } catch (error) {
@@ -42,16 +62,15 @@ const createUser = async (userData) => {
 };
 
 
-// NUEVA FUNCIÓN: actualizar contraseña
-const updatePassword = async (userId, hashedPassword) => {
+// ==============================
+// Actualizar usuario
+// ==============================
+const updateUser = async (userId, updatedData) => {
   try {
 
-    // Actualizamos la contraseña del usuario
     await db('users')
       .where({ id: userId })
-      .update({
-        password: hashedPassword
-      });
+      .update(updatedData);
 
   } catch (error) {
 
@@ -61,9 +80,12 @@ const updatePassword = async (userId, hashedPassword) => {
 };
 
 
-// Exportamos todas las funciones del modelo
+// ==============================
+// Exportaciones
+// ==============================
 module.exports = {
   createUser,
   getUserByEmail,
-  updatePassword
+  getUserById,
+  updateUser
 };

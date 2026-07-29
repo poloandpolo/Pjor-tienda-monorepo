@@ -19,6 +19,7 @@ export const PaymentsList = forwardRef(
       selectedPayment: parentSelectedPayment,
       setSelectedPayment: setParentSelectedPayment,
       onSelectPayment,
+      setActivePaymentMethodId,
     },
     ref
   ) => {
@@ -53,6 +54,7 @@ export const PaymentsList = forwardRef(
     };
 
     const notifyParent = (payment) => {
+
       if (setParentSelectedPayment) {
         setParentSelectedPayment(payment);
       }
@@ -60,11 +62,20 @@ export const PaymentsList = forwardRef(
       if (onSelectPayment) {
         onSelectPayment(payment);
       }
+
+      if (setActivePaymentMethodId) {
+        setActivePaymentMethodId(payment.id);
+      }
+
     };
 
+
     const handleSelection = (payment) => {
+
       setSelectedPayment(payment);
+
       notifyParent(payment);
+
     };
 
     // Auto seleccionar primera tarjeta

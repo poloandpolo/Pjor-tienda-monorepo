@@ -14,7 +14,7 @@ router.options('/', (req, res) => {
 // POST /users
 router.post('/', userController.createUser);
 
-// PUT /users/password
-router.put('/password', userController.updatePassword);
+// PUT /users
+router.put('/', userController.updateUser);
 
 module.exports = router;

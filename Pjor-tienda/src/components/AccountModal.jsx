@@ -8,7 +8,7 @@ import { AddressesAndPaymentsSection } from './AddressesAndPaymentsSection';
 import {
   loginUser,
   registerUser,
-  updateUserPassword
+  updateUser
 } from '../services/authService';
 
 import { useAuth } from '../context/authContext';
@@ -193,22 +193,6 @@ export const AccountModal = ({
   // ========================
   // PASSWORD
   // ========================
-  const updatePassword = async (newPassword) => {
-
-    try {
-
-      await updateUserPassword({
-        userId: user.id,
-        password: newPassword
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-  };
 
   // ========================
   // LOGOUT
@@ -317,16 +301,51 @@ export const AccountModal = ({
 
   };
 
-  const handleSaveClick = (field) => {
+  const handleSaveClick = async (field) => {
 
-    if (field === 'password') {
-      updatePassword(tempValues.password);
+    try {
+
+      const data = {
+        userId: user.id
+      };
+
+      switch (field) {
+
+        case 'firstName':
+          data.firstName = tempValues.firstName;
+          break;
+
+        case 'lastName':
+          data.lastName = tempValues.lastName;
+          break;
+
+        case 'email':
+          data.email = tempValues.email;
+          break;
+
+        case 'password':
+          data.password = tempValues.password;
+          break;
+
+        default:
+          return;
+
+      }
+
+      const result = await updateUser(data);
+
+      login(result.token);
+
+      setEditingFields((prev) => ({
+        ...prev,
+        [field]: false,
+      }));
+
+    } catch (error) {
+
+      console.error(error);
+
     }
-
-    setEditingFields((prev) => ({
-      ...prev,
-      [field]: false,
-    }));
 
   };
 

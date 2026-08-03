@@ -6,6 +6,8 @@ const addressRoutes = require('./routes/addressRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const productsRoutes = require('./routes/productRoutes'); // 🔥 NUEVO
+const departmentRoutes = require('./routes/departmentRoutes');
+
 
 const app = express();
 
@@ -59,6 +61,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 
 app.use('/api/products', productsRoutes); // 🔥 NUEVO ENDPOINT
+app.use('/api/departments', departmentRoutes);
 
 // =======================
 // PORT

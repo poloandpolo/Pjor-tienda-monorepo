@@ -4,17 +4,44 @@ import { ClothingDropdownMenu } from './ClothingDropdownMenu';
 import { ClothingBarButton } from './ClothingBarButton';
 
 export const ClothingBar = ({ dropdownMenus, isOpen, toggleClothingBar }) => {
+
+  console.log('DROPDOWN MENUS:', dropdownMenus);
+
   return (
     <div className={`clothing-bar ${isOpen ? 'clothing-bar--show' : ''}`}>
-      <button className='clothing-bar__close-button' onClick={toggleClothingBar}>X</button>
+      <button 
+        className='clothing-bar__close-button' 
+        onClick={toggleClothingBar}
+      >
+        X
+      </button>
 
-      {dropdownMenus.length > 0 && dropdownMenus.map((menu, index) => (
-        <ClothingDropdownMenu key={index} title={menu.title} emoji={menu.emoji}>
-          {menu.items.map((item, itemIndex) => (
-            <ClothingBarButton key={itemIndex} text={item} />
-          ))}
-        </ClothingDropdownMenu>
-      ))}
+      {dropdownMenus.map((menu) => {
+
+        console.log('MENU:', menu);
+
+        return (
+          <ClothingDropdownMenu
+            key={menu.categoryId || menu.title}
+            title={menu.title}
+            emoji={menu.emoji}
+          >
+            {menu.items.map((item, index) => {
+
+              console.log('ITEM MENU:', item);
+
+              return (
+                <ClothingBarButton
+                  key={item.id || index}
+                  text={item.name || item}
+                />
+              );
+
+            })}
+          </ClothingDropdownMenu>
+        );
+
+      })}
     </div>
   );
 };

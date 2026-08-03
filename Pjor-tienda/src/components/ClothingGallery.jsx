@@ -10,19 +10,16 @@ export const ClothingGallery = ({
     onConfirm
 }) => {
 
-    // ✅ FILTRO SOLO HOMBRE
-    const menItems = items.filter(item => item.category === 'men');
-
     return (
         <div className={`clothing-gallery ${isClothingBarOpen ? 'clothing-gallery--with-clothing-bar' : ''}`}>
-            {menItems.map(item => (
+            {items.map(item => (
                 <ClothingCard
                     key={item.id}
                     images={item.images}
                     text={item.text}
                     id={item.id}
                     sizes={item.sizes}
-                    colors={item.colors}   // 👈 array correcto
+                    colors={item.colors}
                     price={item.price}
                     isClothingBarOpen={isClothingBarOpen}
                     onOpenClothingModal={onOpenClothingModal}

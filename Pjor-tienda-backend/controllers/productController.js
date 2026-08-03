@@ -4,13 +4,14 @@ class ProductsController {
   // GET /api/products
   static async getProducts(req, res) {
     try {
-      const { category } = req.query;
+      const { department } = req.query;
 
-      const products = await ProductsModel.getProducts(category);
+      const products = await ProductsModel.getProducts(department);
 
       return res.status(200).json(products);
     } catch (error) {
       console.error('GET PRODUCTS ERROR:', error);
+
       return res.status(500).json({
         error: 'Error al obtener productos',
       });
@@ -33,6 +34,7 @@ class ProductsController {
       return res.status(200).json(product);
     } catch (error) {
       console.error('GET PRODUCT BY ID ERROR:', error);
+
       return res.status(500).json({
         error: 'Error al obtener producto',
       });

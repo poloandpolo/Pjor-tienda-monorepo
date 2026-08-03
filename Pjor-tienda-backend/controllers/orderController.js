@@ -1,181 +1,261 @@
-const db = require('../db/db');
 const OrderModel = require('../models/orderModel');
+
 
 const OrderController = {
 
+
+  // ==================================================
+  // 🔥 CREATE ORDER
+  // ==================================================
+
   async createOrder(req, res) {
+
     const userId = req.userId;
-    const { items, shipping_address_id, payment_method_id } = req.body;
+
+    const {
+      items,
+      shipping_address_id,
+      payment_method_id
+    } = req.body;
+
 
     if (!items?.length) {
-      return res.status(400).json({ message: 'Cart vacío' });
+
+      return res.status(400).json({
+        message: 'Cart vacío'
+      });
+
     }
 
-    if (!shipping_address_id || !payment_method_id) {
+
+    if (
+      !shipping_address_id ||
+      !payment_method_id
+    ) {
+
       return res.status(400).json({
-        message: 'Faltan datos de dirección o pago'
+        message:
+          'Faltan datos de dirección o pago'
       });
+
     }
+
 
     try {
-      const order = await db.transaction(async (trx) => {
 
-        let subtotal = 0;
-
-        const itemsPrepared = items.map(item => {
-          const price = Number(item.price);
-          const quantity = Number(item.quantity);
-
-          subtotal += price * quantity;
-
-          return {
-            product_id: item.product_id,
-            name: item.name,
-            price,
-            quantity,
-            size: item.size || null,
-            color: item.color || null
-          };
-        });
-
-        const total = subtotal;
-
-        const newOrder = await OrderModel.createOrder(trx, {
-          user_id: userId,
+      const order =
+        await OrderModel.createOrderWithSnapshots({
+          userId,
+          items,
           shipping_address_id,
-          payment_method_id,
-          status: 'pending',
-          subtotal,
-          shipping_cost: 0,
-          taxes: 0,
-          total_amount: total,
-          currency: 'mxn'
+          payment_method_id
         });
 
-        const orderItems = itemsPrepared.map(item => ({
-          order_id: newOrder.id,
-          ...item
-        }));
 
-        await OrderModel.createOrderItems(trx, orderItems);
-
-        // =====================================
-        // SNAPSHOT PAYMENT METHOD
-        // =====================================
-
-        const paymentMethod = await OrderModel.getPaymentMethodById(
-          payment_method_id,
-          trx
-        );
-
-        if (!paymentMethod) {
-          throw new Error('Método de pago no encontrado');
-        }
-
-        await OrderModel.createOrderPaymentMethod(trx, {
-          order_id: newOrder.id,
-          brand: paymentMethod.brand,
-          last4: paymentMethod.last4,
-          exp_month: paymentMethod.exp_month,
-          exp_year: paymentMethod.exp_year
-        });
-
-        return newOrder;
-      });
 
       return res.status(201).json({
-        message: 'Orden creada correctamente',
-        order_id: order.id
+
+        message:
+          'Orden creada correctamente',
+
+        order_id:
+          order.id
+
       });
+
+
 
     } catch (error) {
-      console.error(error);
+
+      console.error(
+        'CREATE ORDER ERROR:',
+        error
+      );
+
 
       return res.status(500).json({
-        message: 'Error creando orden',
-        error: error.message
+
+        message:
+          'Error creando orden',
+
+        error:
+          error.message
+
       });
+
     }
+
   },
 
+
+
+  // ==================================================
+  // 🔥 GET USER ORDERS
+  // ==================================================
+
   async getUserOrders(req, res) {
+
     try {
-      const orders = await OrderModel.getUserOrders(req.userId);
+
+      const orders =
+        await OrderModel.getUserOrders(
+          req.userId
+        );
+
 
       return res.json(orders);
 
+
+
     } catch (error) {
-      console.error(error);
+
+      console.error(
+        'GET USER ORDERS ERROR:',
+        error
+      );
+
 
       return res.status(500).json({
-        message: 'Error obteniendo órdenes'
+
+        message:
+          'Error obteniendo órdenes'
+
       });
+
     }
+
   },
 
+
+
+  // ==================================================
+  // 🔥 GET ORDER BY ID
+  // ==================================================
+
   async getOrderById(req, res) {
+
     try {
-      const order = await OrderModel.getOrderById(
-        req.userId,
-        req.params.id
-      );
+
+
+      const order =
+        await OrderModel.getOrderById(
+          req.userId,
+          req.params.id
+        );
+
+
 
       if (!order) {
+
         return res.status(404).json({
-          message: 'Orden no encontrada'
+
+          message:
+            'Orden no encontrada'
+
         });
+
       }
 
-      const rawItems = await OrderModel.getOrderItems(
-        order.id
-      );
 
-      const items = rawItems.map(item => {
-        let parsedColor = null;
 
-        try {
-          parsedColor = item.color
-            ? JSON.parse(item.color)
-            : null;
-        } catch (e) {
-          parsedColor = item.color;
-        }
+      const rawItems =
+        await OrderModel.getOrderItems(
+          order.id
+        );
 
-        return {
-          ...item,
-          color: parsedColor
-        };
-      });
 
-      const address = await OrderModel.getAddressById(
-        order.shipping_address_id
-      );
 
-      // =====================================
-      // PAYMENT SNAPSHOT
-      // =====================================
+      const items =
+        rawItems.map(item => {
+
+          let parsedColor = null;
+
+
+          try {
+
+            parsedColor =
+              item.color
+                ? JSON.parse(item.color)
+                : null;
+
+
+          } catch {
+
+            parsedColor =
+              item.color;
+
+          }
+
+
+
+          return {
+
+            ...item,
+
+            color:
+              parsedColor
+
+          };
+
+
+        });
+
+
+
+      const address =
+        await OrderModel.getOrderAddress(
+          order.id
+        );
+
+
 
       const payment_method =
         await OrderModel.getOrderPaymentMethod(
           order.id
         );
 
+
+
       return res.json({
+
         ...order,
+
         items,
+
         address,
+
         payment_method
+
       });
+
+
 
     } catch (error) {
-      console.error(error);
+
+
+      console.error(
+        'GET ORDER BY ID ERROR:',
+        error
+      );
+
+
 
       return res.status(500).json({
-        message: 'Error obteniendo orden'
+
+        message:
+          'Error obteniendo orden',
+
+        error:
+          error.message
+
       });
+
+
     }
+
   }
 
 };
+
 
 module.exports = OrderController;

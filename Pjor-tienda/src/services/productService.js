@@ -1,16 +1,16 @@
 import { apiFetch } from './api';
 
-// 🔥 Obtener todos los productos
+// Todos los productos
 export const getProducts = async () => {
   return await apiFetch('/api/products');
 };
 
-// 🔥 Obtener productos por categoría
-export const getProductsByCategory = async (category) => {
-  return await apiFetch(`/api/products?category=${category}`);
+// Productos por departamento
+export const getProductsByDepartment = async (department) => {
+  return await apiFetch(`/api/products?department=${department}`);
 };
 
-// 🔥 Obtener producto individual
+// Producto individual
 export const getProductById = async (id) => {
   return await apiFetch(`/api/products/${id}`);
 };

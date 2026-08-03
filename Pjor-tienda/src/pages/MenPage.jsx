@@ -17,35 +17,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 
 import { useMenPageContext } from '../context/MenPageContext';
-import { getProducts } from '../services/productService'; // 🔥 NUEVO
+import { getProductsByDepartment } from '../services/productService';
+import { getDepartmentMenu } from '../services/departmentService';
 
-const dropdownMenus = [
-  {
-    title: "Gorras",
-    emoji: "🧢",
-    items: ["Beisbol", "Snapback", "5 Paneles"]
-  },
-  {
-    title: "Prendas superiores",
-    emoji: "👕",
-    items: ["Playeras", "Polos", "Camisas", "Hoodies", "Chamarras"]
-  },
-  {
-    title: "Prendas inferiores",
-    emoji: "👖",
-    items: ["Jogger", "Jeans", "Calcetas"]
-  },
-  {
-    title: "Accesorios",
-    emoji: "🧦",
-    items: ["Cinturones", "Calcetas"]
-  },
-  {
-    title: "Joyeria",
-    emoji: "💍",
-    items: ["Collares", "Pulseras", "Brazaletes", "Cadenas", "Dijes"]
-  }
-];
 
 export const MenPage = () => {
   const [isClothingBarOpen, setIsClothingBarOpen] = useState(false);
@@ -55,6 +29,7 @@ export const MenPage = () => {
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [isAccountModalVisible, setIsAccountModalVisible] = useState(false);
+  const [dropdownMenus,setDropdownMenus] = useState([]);
 
   const [menClothingItems, setMenClothingItems] = useState([]); // 🔥 NUEVO
   const [loading, setLoading] = useState(true); // 🔥 NUEVO
@@ -67,19 +42,37 @@ export const MenPage = () => {
 
   // 🔥 FETCH PRODUCTS
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts('men');
-        setMenClothingItems(data);
-      } catch (error) {
-        console.error('Error cargando productos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+      const data = await getProductsByDepartment('men');
 
-    fetchProducts();
-  }, []);
+      console.log('PRODUCTOS:', data);
+
+      setMenClothingItems(data);
+
+    } catch (error) {
+      console.error('Error cargando productos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProducts();
+}, []);
+
+useEffect(()=>{
+
+ const fetchMenu = async()=>{
+
+   const data = await getDepartmentMenu('men');
+
+   setDropdownMenus(data);
+
+ }
+
+ fetchMenu();
+
+},[]);
 
   useEffect(() => {
     if (location.state?.openAccountModal) {

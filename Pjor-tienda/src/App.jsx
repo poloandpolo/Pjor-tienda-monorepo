@@ -1,11 +1,13 @@
 // App.jsx
 
 import './App.css';
+
 import {
   BrowserRouter,
   Route,
   Routes
 } from 'react-router-dom';
+
 
 import { MenPage } from './pages/MenPage';
 import { LandingPage } from './pages/LandingPage';
@@ -16,21 +18,27 @@ import { CrewPage } from './pages/CrewPage';
 import CheckoutPage from './pages/CheckoutPage';
 import { WakingupPage } from './pages/WakingupPage';
 
+
 import { MenPageContextProvider } from './context/MenPageContext';
 import { AuthProvider } from './context/authContext';
+
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-function App() {
-  return (
-    <div className="body">
 
-      <AuthProvider>
+function App() {
+
+  return (
+
+    <AuthProvider>
+
+      <MenPageContextProvider>
 
         <BrowserRouter>
 
           <Routes>
+
 
             {/* PRE LANDING */}
             <Route
@@ -38,62 +46,74 @@ function App() {
               element={<WakingupPage />}
             />
 
-            {/* LANDING REAL */}
+
+            {/* LANDING */}
             <Route
               path="/landing"
               element={<LandingPage />}
             />
 
+
+            {/* HOMBRE */}
             <Route
               path="/hombre"
-              element={
-                <MenPageContextProvider>
-                  <MenPage />
-                </MenPageContextProvider>
-              }
+              element={<MenPage />}
             />
 
+
+            {/* MUJER */}
             <Route
               path="/mujer"
-              element={
-                <MenPageContextProvider>
-                  <WomenPage />
-                </MenPageContextProvider>
-              }
+              element={<WomenPage />}
             />
 
+
+            {/* MEDIA */}
             <Route
               path="/media"
               element={<MediaPage />}
             />
 
+
+            {/* CREW */}
             <Route
               path="/crew"
               element={<CrewPage />}
             />
 
+
+            {/* VISION */}
             <Route
               path="/vision"
               element={<VisionPage />}
             />
 
+
+            {/* CHECKOUT */}
             <Route
               path="/checkout"
-              element={
-                <MenPageContextProvider>
-                  <CheckoutPage />
-                </MenPageContextProvider>
-              }
+              element={<CheckoutPage />}
             />
+
+
+            {/* RUTA DESCONOCIDA */}
+            <Route
+              path="*"
+              element={<LandingPage />}
+            />
+
 
           </Routes>
 
         </BrowserRouter>
 
-      </AuthProvider>
+      </MenPageContextProvider>
 
-    </div>
+    </AuthProvider>
+
   );
+
 }
+
 
 export default App;

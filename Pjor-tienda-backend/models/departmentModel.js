@@ -32,14 +32,20 @@ class DepartmentModel {
           .where({
             category_id: category.id
           })
-          .select('name')
+          .select(
+            'id',
+            'name'
+          )
           .orderBy('id');
 
 
         return {
           title: category.name,
           emoji: category.emoji,
-          items: items.map(item=>item.name)
+          items: items.map(item => ({
+            id: item.id,
+            name: item.name
+          }))
         };
 
       })

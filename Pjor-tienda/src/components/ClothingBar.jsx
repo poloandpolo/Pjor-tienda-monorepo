@@ -3,45 +3,55 @@ import './styles/ClothingBar.scss';
 import { ClothingDropdownMenu } from './ClothingDropdownMenu';
 import { ClothingBarButton } from './ClothingBarButton';
 
-export const ClothingBar = ({ dropdownMenus, isOpen, toggleClothingBar }) => {
-
-  console.log('DROPDOWN MENUS:', dropdownMenus);
+export const ClothingBar = ({
+  dropdownMenus,
+  isOpen,
+  toggleClothingBar,
+  onSelectGarmentType
+}) => {
 
   return (
     <div className={`clothing-bar ${isOpen ? 'clothing-bar--show' : ''}`}>
-      <button 
-        className='clothing-bar__close-button' 
+
+      <button
+        className='clothing-bar__close-button'
         onClick={toggleClothingBar}
       >
         X
       </button>
 
-      {dropdownMenus.map((menu) => {
 
-        console.log('MENU:', menu);
+      {dropdownMenus.map((menu) => (
 
-        return (
-          <ClothingDropdownMenu
-            key={menu.categoryId || menu.title}
-            title={menu.title}
-            emoji={menu.emoji}
-          >
-            {menu.items.map((item, index) => {
+        <ClothingDropdownMenu
+          key={menu.categoryId || menu.title}
+          title={menu.title}
+          emoji={menu.emoji}
+        >
 
-              console.log('ITEM MENU:', item);
+          {menu.items.map((item) => (
 
-              return (
-                <ClothingBarButton
-                  key={item.id || index}
-                  text={item.name || item}
-                />
-              );
+            <ClothingBarButton
 
-            })}
-          </ClothingDropdownMenu>
-        );
+              key={item.id}
 
-      })}
+              text={item.name}
+
+              onClick={(checked) =>
+                onSelectGarmentType(
+                  item.id,
+                  checked
+                )
+              }
+
+            />
+
+          ))}
+
+        </ClothingDropdownMenu>
+
+      ))}
+
     </div>
   );
 };

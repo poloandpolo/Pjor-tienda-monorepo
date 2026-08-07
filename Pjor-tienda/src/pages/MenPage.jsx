@@ -15,130 +15,250 @@ import { AccountButton } from '../components/AccountButton';
 import { AccountModal } from '../components/AccountModal';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-
 import { useMenPageContext } from '../context/MenPageContext';
 import { getProductsByDepartment } from '../services/productService';
 import { getDepartmentMenu } from '../services/departmentService';
 
 
 export const MenPage = () => {
+
   const [isClothingBarOpen, setIsClothingBarOpen] = useState(false);
   const [shoppingCartIsOpen, setShoppingCartIsOpen] = useState(false);
+
   const [isClothingModalOpen, setIsClothingModalOpen] = useState(false);
   const [clothingModalData, setClothingModalData] = useState(null);
+
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [isAccountModalVisible, setIsAccountModalVisible] = useState(false);
-  const [dropdownMenus,setDropdownMenus] = useState([]);
 
-  const [menClothingItems, setMenClothingItems] = useState([]); // 🔥 NUEVO
-  const [loading, setLoading] = useState(true); // 🔥 NUEVO
+  const [isAccountModalVisible, setIsAccountModalVisible] = useState(false);
+
+  const [dropdownMenus, setDropdownMenus] = useState([]);
+
+  const [menClothingItems, setMenClothingItems] = useState([]);
+
+  const [filteredClothingItems, setFilteredClothingItems] = useState([]);
+
+  const [selectedGarmentTypes, setSelectedGarmentTypes] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
 
   const navigate = useNavigate();
-
   const location = useLocation();
 
   const { addToCart } = useMenPageContext();
 
-  // 🔥 FETCH PRODUCTS
-  useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const data = await getProductsByDepartment('men');
 
-      console.log('PRODUCTOS:', data);
-
-      setMenClothingItems(data);
-
-    } catch (error) {
-      console.error('Error cargando productos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchProducts();
-}, []);
-
-useEffect(()=>{
-
- const fetchMenu = async()=>{
-
-   const data = await getDepartmentMenu('men');
-
-   setDropdownMenus(data);
-
- }
-
- fetchMenu();
-
-},[]);
 
   useEffect(() => {
-    if (location.state?.openAccountModal) {
+
+    const fetchProducts = async () => {
+
+      try {
+
+        const data = await getProductsByDepartment('men');
+
+        console.log('PRODUCTOS:', data);
+
+        setMenClothingItems(data);
+        setFilteredClothingItems(data);
+
+      } catch(error){
+
+        console.error(error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+    fetchProducts();
+
+  }, []);
+
+
+
+  useEffect(() => {
+
+    const fetchMenu = async()=>{
+
+      try{
+
+        const data = await getDepartmentMenu('men');
+
+        console.log('MENU:', data);
+
+        setDropdownMenus(data);
+
+      }catch(error){
+
+        console.error(error);
+
+      }
+
+    };
+
+
+    fetchMenu();
+
+  }, []);
+
+
+
+
+  useEffect(()=>{
+
+    if(location.state?.openAccountModal){
+
       setIsAccountModalVisible(true);
+
     }
-  }, [location.state]);
 
-  const toggleAccountModal = () => {
-    setIsAccountModalVisible(prev => !prev);
+  },[location.state]);
+
+
+
+
+  const handleSelectGarmentType = (garmentTypeId, checked)=>{
+
+
+    setSelectedGarmentTypes(prev=>{
+
+
+      const updated = checked
+      ? [...prev, garmentTypeId]
+      : prev.filter(id=>id !== garmentTypeId);
+
+
+
+      console.log(
+        'GARMENTS:',
+        updated
+      );
+
+
+
+      if(updated.length === 0){
+
+        setFilteredClothingItems(
+          menClothingItems
+        );
+
+      }else{
+
+
+        const filtered = menClothingItems.filter(product=>
+
+          updated.includes(
+            product.garmentTypeId
+          )
+
+        );
+
+
+        setFilteredClothingItems(filtered);
+
+      }
+
+
+      return updated;
+
+    });
+
+
   };
 
-  const toggleClothingBar = () => {
-    setIsClothingBarOpen(prev => !prev);
+
+
+  const toggleAccountModal = ()=>{
+    setIsAccountModalVisible(prev=>!prev);
   };
 
-  const openShoppingCart = () => {
+
+  const toggleClothingBar = ()=>{
+    setIsClothingBarOpen(prev=>!prev);
+  };
+
+
+  const openShoppingCart = ()=>{
     setShoppingCartIsOpen(true);
   };
 
-  const closeShoppingCart = () => {
+
+  const closeShoppingCart = ()=>{
     setShoppingCartIsOpen(false);
   };
 
-  const openClothingModal = (item) => {
+
+  const openClothingModal=(item)=>{
+
     setClothingModalData(item);
     setIsClothingModalOpen(true);
+
   };
 
-  const closeClothingModal = () => {
+
+  const closeClothingModal=()=>{
+
     setClothingModalData(null);
     setIsClothingModalOpen(false);
+
   };
 
-  const openWarningModal = () => {
+
+  const openWarningModal=()=>{
     setIsWarningModalOpen(true);
   };
 
-  const closeWarningModal = () => {
+
+  const closeWarningModal=()=>{
     setIsWarningModalOpen(false);
   };
 
-  const openConfirmationModal = () => {
+
+  const openConfirmationModal=()=>{
     setIsConfirmationModalOpen(true);
   };
 
-  const closeConfirmationModal = () => {
+
+  const closeConfirmationModal=()=>{
     setIsConfirmationModalOpen(false);
   };
 
-  const handleClickPayment = () => {
+
+  const handleClickPayment=()=>{
     navigate('/checkout');
   };
 
+
+
   return (
+
     <div className='men-page'>
+
       <Header />
+
       <NavigationBar />
+
 
       <div className='men-page__clothing-section'>
 
+
         {!isClothingBarOpen && (
+
           <ClothingMenuButton
             toggleClothingBar={toggleClothingBar}
             isOpen={isClothingBarOpen}
           />
+
         )}
+
+
 
         <AccountModal
           isVisible={isAccountModalVisible}
@@ -146,21 +266,29 @@ useEffect(()=>{
           openOrdersOnLoad={location.state?.openOrdersSection}
         />
 
+
+
         <AccountButton
           isOpen={isClothingBarOpen}
           onClick={toggleAccountModal}
         />
+
+
 
         <ShoppingCartButton
           onClick={openShoppingCart}
           isOpen={isClothingBarOpen}
         />
 
+
+
         <ShoppingCart
           isOpen={shoppingCartIsOpen}
           onClose={closeShoppingCart}
           onClickPayment={handleClickPayment}
         />
+
+
 
         <ClothingModal
           isOpen={isClothingModalOpen}
@@ -170,37 +298,56 @@ useEffect(()=>{
           onConfirm={openConfirmationModal}
         />
 
+
+
         <ConfirmationModal
           isOpen={isConfirmationModalOpen}
           onClose={closeConfirmationModal}
         />
+
+
 
         <WarningModal
           isOpen={isWarningModalOpen}
           onClose={closeWarningModal}
         />
 
+
+
         {isClothingBarOpen && (
+
           <ClothingBar
             dropdownMenus={dropdownMenus}
             isOpen={isClothingBarOpen}
             toggleClothingBar={toggleClothingBar}
+            onSelectGarmentType={handleSelectGarmentType}
           />
+
         )}
 
+
+
         {!loading && (
+
           <ClothingGallery
-            items={menClothingItems}
+            items={filteredClothingItems}
             isClothingBarOpen={isClothingBarOpen}
             onOpenClothingModal={openClothingModal}
             onConfirm={openConfirmationModal}
             onWarning={openWarningModal}
           />
+
         )}
+
 
       </div>
 
+
       <Footer />
+
+
     </div>
+
   );
+
 };

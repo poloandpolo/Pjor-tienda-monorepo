@@ -1,6 +1,7 @@
 const db = require('../db/db.js');
 
 class ProductModel {
+
   static async formatProduct(product) {
     const images = await db('product_images')
       .where({ product_id: product.id })
@@ -37,6 +38,7 @@ class ProductModel {
     };
   }
 
+
   static async getAllProducts() {
     const products = await db('products')
       .leftJoin(
@@ -59,10 +61,25 @@ class ProductModel {
       .where('products.active', true)
       .orderBy('products.id', 'asc');
 
-    return Promise.all(products.map((product) => this.formatProduct(product)));
+
+    return Promise.all(
+      products.map((product) => this.formatProduct(product))
+    );
   }
 
+
   static async getProductsByDepartment(department) {
+
+    let departmentSlugs = [department];
+
+    if (department === 'men') {
+      departmentSlugs = ['men', 'unisex'];
+    } 
+    else if (department === 'women') {
+      departmentSlugs = ['women', 'unisex'];
+    }
+
+
     const products = await db('products')
       .join(
         'product_departments',
@@ -92,13 +109,19 @@ class ProductModel {
         'categories.name as category'
       )
       .where('products.active', true)
-      .where('departments.slug', department)
+      .whereIn('departments.slug', departmentSlugs)
+      .distinct('products.id')
       .orderBy('products.id', 'asc');
 
-    return Promise.all(products.map((product) => this.formatProduct(product)));
+
+    return Promise.all(
+      products.map((product) => this.formatProduct(product))
+    );
   }
 
+
   static async getProducts(department) {
+
     if (department) {
       return this.getProductsByDepartment(department);
     }
@@ -106,7 +129,9 @@ class ProductModel {
     return this.getAllProducts();
   }
 
+
   static async getProductById(id) {
+
     const product = await db('products')
       .leftJoin(
         'garment_types',
@@ -129,9 +154,11 @@ class ProductModel {
       .where('products.active', true)
       .first();
 
+
     if (!product) {
       return null;
     }
+
 
     return this.formatProduct(product);
   }

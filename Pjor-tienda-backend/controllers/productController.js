@@ -1,6 +1,7 @@
 const ProductsModel = require('../models/productModel');
 
 class ProductsController {
+
   // GET /api/products
   static async getProducts(req, res) {
     try {
@@ -9,6 +10,7 @@ class ProductsController {
       const products = await ProductsModel.getProducts(department);
 
       return res.status(200).json(products);
+
     } catch (error) {
       console.error('GET PRODUCTS ERROR:', error);
 
@@ -17,6 +19,7 @@ class ProductsController {
       });
     }
   }
+
 
   // GET /api/products/:id
   static async getProductById(req, res) {
@@ -32,6 +35,7 @@ class ProductsController {
       }
 
       return res.status(200).json(product);
+
     } catch (error) {
       console.error('GET PRODUCT BY ID ERROR:', error);
 

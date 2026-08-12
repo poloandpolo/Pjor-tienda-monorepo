@@ -16,8 +16,11 @@ export const ShoppingCart = ({ isOpen, onClose, onClickPayment }) => {
   ));
 
   const handleCheckout = () => {
+    
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('jwt');
+
+    console.log(token)
 
     if (!token) {
       alert('Es necesario crear una cuenta para proceder al pago.');

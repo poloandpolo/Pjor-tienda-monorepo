@@ -185,9 +185,9 @@ export const MenPage = () => {
   };
 
 
-  const openShoppingCart = ()=>{
-    setShoppingCartIsOpen(true);
-  };
+    const openShoppingCart = ()=>{
+      setShoppingCartIsOpen(true);
+    };
 
 
   const closeShoppingCart = ()=>{
